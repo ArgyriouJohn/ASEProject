@@ -14,8 +14,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.Settings;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
@@ -23,7 +26,9 @@ import android.graphics.drawable.Drawable;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
 
 public class MainActivity extends MapActivity implements LocationListener 
 {
@@ -35,11 +40,17 @@ public class MainActivity extends MapActivity implements LocationListener
     double longitude;
     Button logOutButton;
 	
+    @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitNetwork().build();
+        StrictMode.setThreadPolicy(policy);
+        
+    	Location entry = new Location(MainActivity.this);
         
         logOutButton = (Button) findViewById(R.id.logOutButton);
         logOutButton.setOnClickListener(new View.OnClickListener() {
@@ -143,6 +154,8 @@ public class MainActivity extends MapActivity implements LocationListener
     	longitude = location.getLongitude();
     	GeoPoint point = new GeoPoint((int)(latitude * 1E6), (int)(longitude *1E6));
     	
+    	Location entry = new Location(MainActivity.this);
+    	
     	// Update itemizedoverlay when location changes.
     	List<Overlay> mapOverlays = mapView.getOverlays();
         CustomItemizedOverlay itemizedoverlay = (CustomItemizedOverlay) mapOverlays.get(0);
@@ -167,6 +180,16 @@ public class MainActivity extends MapActivity implements LocationListener
     public void onProviderDisabled(String provider) 
     {
     	Toast.makeText(this, "Disabled provider " + provider,Toast.LENGTH_SHORT).show();
+    }
+    
+    @Override
+    public void onBackPressed() {    			
+		Dialog d = new Dialog(MainActivity.this);
+		d.setTitle(":(");
+		TextView tv = new TextView(MainActivity.this);
+		tv.setText("Please use the Log Out button at the top to logout!");
+		d.setContentView(tv);
+		d.show();
     }
 
 }

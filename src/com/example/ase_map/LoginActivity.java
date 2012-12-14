@@ -2,6 +2,8 @@ package com.example.ase_map;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -16,10 +18,14 @@ public class LoginActivity extends Activity implements OnClickListener {
 	Button sqlRegister, sqlView, sqlLogin, sqlDelete, logOut;
 	EditText sqlUsername, sqlPassword, sqlEmail;
 	
+    @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_login);
+        
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitNetwork().build();
+        StrictMode.setThreadPolicy(policy);
         
         sqlUsername = (EditText) findViewById(R.id.username);
         sqlPassword = (EditText) findViewById(R.id.password);
@@ -41,7 +47,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 				
 				if(didItWork == entry.checkUserLogin(username, password)) {
 					Dialog d = new Dialog(LoginActivity.this);
-					d.setTitle("Heck Yeah");
+					d.setTitle(":)");
 					TextView tv = new TextView(LoginActivity.this);
 					tv.setText("You have successfully loged in!");
 					d.setContentView(tv);
@@ -53,7 +59,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 					
 				} else {
 					Dialog d = new Dialog(LoginActivity.this);
-					d.setTitle("Nahh");
+					d.setTitle(":(");
 					TextView tv = new TextView(LoginActivity.this);
 					tv.setText("We couldn't log you in!" + "\n" + "Please make sure you are registered, or try again using the correct username & password");
 					d.setContentView(tv);
@@ -80,16 +86,16 @@ public class LoginActivity extends Activity implements OnClickListener {
 						boolean isEmailValid = checkInfo.checkEmail(email);
 						User entry = new User(LoginActivity.this);
 						entry.open();
-						if(isUsernameValid & isPasswordValid & isEmailValid) {
-							entry.createEntry(username, password, email);
+						if(isUsernameValid & isPasswordValid & isEmailValid & didItWork == entry.checkUserRegistration(username, password, email)) {
+							//entry.createEntry(username, password, email);
 							entry.close();
 							didItWork = true;							
 						} else {
 							didItWork = false;
 							Dialog d = new Dialog(LoginActivity.this);
-							d.setTitle("Nahh");
+							d.setTitle(":(");
 							TextView tv = new TextView(LoginActivity.this);
-							tv.setText("Something went really bad!" + "\n" + "Please make sure all information is correct!");
+							tv.setText("Something went really bad!" + "\n" + "\n" + "Please make sure you are registered and all information above is correct!");
 							d.setContentView(tv);
 							d.show();
 							sqlEmail.setVisibility(View.VISIBLE);
@@ -103,13 +109,13 @@ public class LoginActivity extends Activity implements OnClickListener {
 						TextView tv = new TextView(LoginActivity.this);
 						tv.setText(error);
 						d.setContentView(tv);
-						d.show();
+						d.show();						
 						
 						didItWork = false;
 					} finally {
 						if(didItWork) {
 							Dialog d = new Dialog(LoginActivity.this);
-							d.setTitle("Heck Yeah");
+							d.setTitle(":)");
 							TextView tv = new TextView(LoginActivity.this);
 							tv.setText("Thank you for registeting!" + "\n" + "Now put that info again and click login!");
 							d.setContentView(tv);
@@ -122,12 +128,14 @@ public class LoginActivity extends Activity implements OnClickListener {
 					sqlRegister.setText("Register!");
 				}
 				else {
-					sqlEmail.setVisibility(View.INVISIBLE);
-					sqlRegister.setVisibility(View.INVISIBLE);
+					//sqlEmail.setVisibility(View.INVISIBLE);
+					//sqlRegister.setVisibility(View.INVISIBLE);
+					sqlRegister.setText("Register!");
 				}
 				
 			}
 		});
+                
         
         /*
          * Delete Button used for testing only to quickly wipe the DB row's in the table.
@@ -178,4 +186,12 @@ public class LoginActivity extends Activity implements OnClickListener {
 	public void onClick(DialogInterface dialog, int which) {
 		
 	}
+	
+	@Override
+    public void onBackPressed() {    			
+		Intent intent = new Intent(Intent.ACTION_MAIN);
+		intent.addCategory(Intent.CATEGORY_HOME);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+    }
 }
