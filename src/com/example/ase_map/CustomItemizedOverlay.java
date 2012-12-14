@@ -1,5 +1,6 @@
 package com.example.ase_map;
 
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,13 +9,18 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Movie;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
+
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;
 import com.google.android.maps.OverlayItem;
+import com.google.android.maps.Projection;
 
 public class CustomItemizedOverlay extends ItemizedOverlay
 {
@@ -120,12 +126,20 @@ public class CustomItemizedOverlay extends ItemizedOverlay
          paint.setTextSize(20);
          paint.setARGB(150, 0, 0, 0); // alpha, r, g, b (Black, semi see-through)
 
-         //---add the markers---
+         //---add the marker---
          Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.sb);            
          canvas.drawBitmap(bmp, screenPts.x -85, screenPts.y -220, null);
          canvas.drawText(days.format(dNow), screenPts.x, screenPts.y -145, paint);
          canvas.drawText(hours.format(dNow), screenPts.x, screenPts.y -165, paint);
          canvas.drawText("Lat: "+String.valueOf(mapView.getMapCenter().getLatitudeE6()), screenPts.x, screenPts.y -105, paint);
          canvas.drawText("Lon: "+String.valueOf(mapView.getMapCenter().getLongitudeE6()), screenPts.x, screenPts.y -125, paint); 
+         //translateAnimation(mapView,p,mContext);
+         InputStream is = mContext.getResources().openRawResource(R.drawable.cat);
+         Movie mMovie = Movie.decodeStream(is);
+         mMovie.draw(canvas,screenPts.x,screenPts.y);
+         MapView.LayoutParams screenParameters = new MapView.LayoutParams(
+     		    MapView.LayoutParams.WRAP_CONTENT, MapView.LayoutParams.WRAP_CONTENT, p, 0,
+     		    0, MapView.LayoutParams.LEFT | MapView.LayoutParams.BOTTOM);
+        // mapView.addView(imageView, screenParameters);
 	  }
 }
