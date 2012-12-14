@@ -1,14 +1,12 @@
 package com.example.ase_map;
 
 import java.util.List;
-
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
-
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -17,11 +15,10 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.Settings;
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.Menu;
 import android.view.View;
@@ -47,11 +44,13 @@ public class MainActivity extends MapActivity implements LocationListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+//        Bundle extras = getIntent().getExtras();
+//        String strvalue= extras.getString("username");
+//        System.out.println(strvalue);
+        
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitNetwork().build();
         StrictMode.setThreadPolicy(policy);
-        
-    	Location entry = new Location(MainActivity.this);
-        
+                
         logOutButton = (Button) findViewById(R.id.logOutButton);
         logOutButton.setOnClickListener(new View.OnClickListener() {
 			
@@ -151,14 +150,25 @@ public class MainActivity extends MapActivity implements LocationListener
     public void onLocationChanged(Location location) 
     {   	
     	latitude = location.getLatitude();
-    	longitude = location.getLongitude();
-    	GeoPoint point = new GeoPoint((int)(latitude * 1E6), (int)(longitude *1E6));
-    	
-    	Location entry = new Location(MainActivity.this);
+    	longitude = location.getLongitude();    	
+    	GeoPoint point = new GeoPoint((int)(latitude * 1E6), (int)(longitude *1E6));    	    	
     	
     	// Update itemizedoverlay when location changes.
     	List<Overlay> mapOverlays = mapView.getOverlays();
         CustomItemizedOverlay itemizedoverlay = (CustomItemizedOverlay) mapOverlays.get(0);
+    	
+        // Create new entry for the database and when the location is changed put those values in the db.
+        LocationStuff locEntry = new LocationStuff(MainActivity.this);
+        Bundle extras = getIntent().getExtras();
+        String strvalue= extras.getString("username");        
+        locEntry.open();
+//        locEntry.clearDb();
+        locEntry.createEntry(strvalue, longitude, latitude);
+        System.out.println("USERAS " +strvalue);
+        Toast toast = Toast.makeText(getBaseContext(), locEntry.getData(), 10000);
+        toast.show();
+        locEntry.close();    	
+    	
         OverlayItem oldOverlayitem = itemizedoverlay.getItem(0);
         OverlayItem newOverlayitem = new OverlayItem(point," "," ");
         itemizedoverlay.setOverlay(oldOverlayitem,newOverlayitem);
@@ -183,13 +193,15 @@ public class MainActivity extends MapActivity implements LocationListener
     }
     
     @Override
-    public void onBackPressed() {    			
-		Dialog d = new Dialog(MainActivity.this);
-		d.setTitle(":(");
-		TextView tv = new TextView(MainActivity.this);
-		tv.setText("Please use the Log Out button at the top to logout!");
-		d.setContentView(tv);
-		d.show();
+    public void onBackPressed() {
+		new AlertDialog.Builder(MainActivity.this).setTitle(" ").setMessage("Please use the Log Out button at the top to logout first!").setIcon(R.drawable.warning).setNeutralButton("Close", null).show();  			        
+
+//		Dialog d = new Dialog(MainActivity.this);
+//		d.setTitle(":(");
+//		TextView tv = new TextView(MainActivity.this);
+//		tv.setText("Please use the Log Out button at the top to logout!");
+//		d.setContentView(tv);
+//		d.show();
     }
 
 }

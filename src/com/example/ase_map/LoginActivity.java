@@ -1,10 +1,10 @@
 package com.example.ase_map;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -16,8 +16,7 @@ import android.widget.*;
 public class LoginActivity extends Activity implements OnClickListener {
 
 	Button sqlRegister, sqlView, sqlLogin, sqlDelete, logOut;
-	EditText sqlUsername, sqlPassword, sqlEmail;
-	
+	EditText sqlUsername, sqlPassword, sqlEmail;	
     @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,6 +43,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 				
 				User entry = new User(LoginActivity.this);
 				entry.open();
+				System.out.println("USERAS: " + entry.getUsername(username));
 				
 				if(didItWork == entry.checkUserLogin(username, password)) {
 					Dialog d = new Dialog(LoginActivity.this);
@@ -54,16 +54,20 @@ public class LoginActivity extends Activity implements OnClickListener {
 					d.show();
 					d.dismiss();
 					Intent mapIntent = new Intent(LoginActivity.this, MainActivity.class);
+					String message = username;
+					mapIntent.putExtra("username", message);
 					startActivity(mapIntent);
 					entry.close();
 					
 				} else {
-					Dialog d = new Dialog(LoginActivity.this);
-					d.setTitle(":(");
-					TextView tv = new TextView(LoginActivity.this);
-					tv.setText("We couldn't log you in!" + "\n" + "Please make sure you are registered, or try again using the correct username & password");
-					d.setContentView(tv);
-					d.show();				
+					new AlertDialog.Builder(LoginActivity.this).setTitle(" ").setMessage("We couldn't log you in!" + "\n" 
+							+ "Please make sure you are registered," + "\n" + "or try again using a different username & password.").setIcon(R.drawable.warning).setNeutralButton("Close", null).show();  			        
+//					Dialog d = new Dialog(LoginActivity.this);
+//					d.setTitle(":(");
+//					TextView tv = new TextView(LoginActivity.this);
+//					tv.setText("We couldn't log you in!" + "\n" + "Please make sure you are registered, or try again using the correct username & password");
+//					d.setContentView(tv);
+//					d.show();				
 					entry.close();
 				}
 			}						
@@ -92,12 +96,14 @@ public class LoginActivity extends Activity implements OnClickListener {
 							didItWork = true;							
 						} else {
 							didItWork = false;
-							Dialog d = new Dialog(LoginActivity.this);
-							d.setTitle(":(");
-							TextView tv = new TextView(LoginActivity.this);
-							tv.setText("Something went really bad!" + "\n" + "\n" + "Please make sure you are registered and all information above is correct!");
-							d.setContentView(tv);
-							d.show();
+							new AlertDialog.Builder(LoginActivity.this).setTitle(" ").setMessage("Something went really bad!" + "\n" 
+							+ "Please make sure you are registered and all information above is correct!").setIcon(R.drawable.warning).setNeutralButton("Close", null).show();
+//							Dialog d = new Dialog(LoginActivity.this);
+//							d.setTitle(":(");
+//							TextView tv = new TextView(LoginActivity.this);
+//							tv.setText("Something went really bad!" + "\n" + "\n" + "Please make sure you are registered and all information above is correct!");
+//							d.setContentView(tv);
+//							d.show();
 							sqlEmail.setVisibility(View.VISIBLE);
 							sqlRegister.setVisibility(View.VISIBLE);
 						}

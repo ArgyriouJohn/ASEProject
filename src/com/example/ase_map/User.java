@@ -28,7 +28,6 @@ public class User {
 
 		public DbHelper(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
-			// TODO Auto-generated constructor stub
 		}
 
 		@Override
@@ -147,15 +146,24 @@ public class User {
 				}
 				//return true;
 			//}
-		//}		
-			
+		//}				
 	}
 	
-	public void clearDb() {
-		
+	public String getUsername(String usernameFromTextField) {
+			String result = "";
+		    Cursor c=ourDatabase.rawQuery("SELECT "+ KEY_USERNAME + " FROM " + DATABASE_TABLE + " WHERE " + KEY_USERNAME 
+				   + " =" + "'" + usernameFromTextField + "'",new String [] {});		    			    
+		    	
+	    		int iUsername = c.getColumnIndex(KEY_USERNAME);
+	    		for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
+	    			result = c.getString(iUsername);
+	    		}
+		   return result;																			
+	}
+	
+	public void clearDb() {		
 		String delete = "DELETE FROM " + DATABASE_TABLE;
-		ourDatabase.execSQL(delete);		
-		
+		ourDatabase.execSQL(delete);				
 	}
 	
 }
