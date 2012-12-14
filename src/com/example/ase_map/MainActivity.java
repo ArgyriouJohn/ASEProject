@@ -21,6 +21,8 @@ import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 public class MainActivity extends MapActivity implements LocationListener 
@@ -31,12 +33,26 @@ public class MainActivity extends MapActivity implements LocationListener
 	private String provider;
 	double latitude;
     double longitude;
+    Button logOutButton;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        logOutButton = (Button) findViewById(R.id.logOutButton);
+        logOutButton.setOnClickListener(new View.OnClickListener() {
+			
+			public void onClick(View v) {
+				Intent broadcastIntent = new Intent();
+				broadcastIntent.setAction("com.package.ACTION_LOGOUT");
+				sendBroadcast(broadcastIntent);
+				
+				Intent logInIntent = new Intent(MainActivity.this, LoginActivity.class);
+				startActivity(logInIntent);
+			}
+		});
         
         // Get the location manager
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

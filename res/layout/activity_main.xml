@@ -10,7 +10,21 @@
     android:layout_height="fill_parent"
     android:enabled="true"
     android:clickable="true"
-    android:apiKey="0X2ubt8tG2XWrTp5E7TQTv4uaycIPzQE2OmpzyA"
-/>
+    android:apiKey="0gFM17_MU4h4NI8u1Xvueo4aOsXzVwBPeXq9xoQ"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" >
+
+        <Button
+            android:id="@+id/logOutButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/Logout" />
+
+    </LinearLayout>
 
 </RelativeLayout>

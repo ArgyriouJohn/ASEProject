@@ -1,8 +1,10 @@
 <resources>
-
     <string name="app_name">ASE_map</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_registration_login">LoginActivity</string>
+    <string name="Logout">Log Out</string>
+    <string name="title_activity_logout">LogOutActivity</string>
 
 </resources>
