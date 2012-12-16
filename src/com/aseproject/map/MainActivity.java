@@ -9,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
@@ -23,6 +24,7 @@ import android.provider.SyncStateContract.Constants;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
@@ -39,11 +41,13 @@ import android.widget.Toast;
 
 import com.aseproject.location.LocationsHandling;
 import com.aseproject.login.LoginActivity;
+import com.aseproject.login.UserAuth;
 import com.aseproject.places.GooglePlaces;
 import com.aseproject.places.Place;
 import com.aseproject.places.PlaceDetails;
 import com.aseproject.places.PlacesList;
 import com.aseproject.profile.ProfileActivity;
+import com.aseproject.utilities.User;
 import com.aseproject.utilities.Utils;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -72,6 +76,7 @@ public class MainActivity extends MapActivity implements LocationListener
     ImageButton logOutButton;
     ImageButton showNearLocButton;
     ImageButton accountInfoButton;
+    ImageButton visInvis;
 
     
     TextView date;
@@ -165,7 +170,7 @@ public class MainActivity extends MapActivity implements LocationListener
         // Dispalay an itemizedoverlay on the map.
         final List<Overlay> mapOverlays = mapView.getOverlays();
         Bundle extras = getIntent().getExtras();
-        String username= extras.getString("username");
+        final String username= extras.getString("username");
         Drawable drawable = this.getResources().getDrawable(R.drawable.bmarker);
         final CustomItemizedOverlay itemizedoverlay = new CustomItemizedOverlay(username,drawable, this,placeLayoutDetails,placeDetails, googlePlaces);
         OverlayItem overlayitem = new OverlayItem(point," "," ");
@@ -211,19 +216,69 @@ public class MainActivity extends MapActivity implements LocationListener
              }
         });
         
-        accountInfoButton = (ImageButton) findViewById(R.id.imageButton3);
+        //Visible/Invisible Button Handler
+        visInvis = (ImageButton) findViewById(R.id.visInvisImmageButton);
+        User entry = new User(MainActivity.this);
+	    entry.open();
+	    final UserAuth user = entry.retrieveProfileInfo(username);
+	    final int userVisibility = user.getVisibility();
+	    entry.close();
+	    System.out.println(userVisibility);
+	    if(userVisibility == 0) {
+	    	visInvis.setBackgroundResource(R.drawable.vis);
+	    } else {
+	    	visInvis.setBackgroundResource(R.drawable.invis);
+	    }
+	    
+        visInvis.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				AlphaAnimation alphaDown = new AlphaAnimation(1.0f, 0.3f);
+			    AlphaAnimation alphaUp = new AlphaAnimation(0.3f, 1.0f);
+			    alphaDown.setDuration(1000);
+			    alphaUp.setDuration(500);
+			    alphaDown.setFillAfter(true);
+			    alphaUp.setFillAfter(true);
+			    v.startAnimation(alphaUp);				    
+			    User entry = new User(MainActivity.this);
+			    entry.open();
+			    final UserAuth user = entry.retrieveProfileInfo(username);
+			    if(user.getVisibility() == 0) {
+			    	entry.setVisibility(username, 1);
+			    	visInvis.setBackgroundResource(R.drawable.invis);
+				    Toast.makeText(getApplicationContext(), "Your details are now invisible to others!", Toast.LENGTH_LONG).show();
+			    } else {
+			    	entry.setVisibility(username, 0);
+			    	visInvis.setBackgroundResource(R.drawable.vis);
+				    Toast.makeText(getApplicationContext(), "Your details are now visible to others!", Toast.LENGTH_LONG).show();
+			    }
+			    entry.close();
+			}
+		});
+        
+        accountInfoButton = (ImageButton) findViewById(R.id.showProfileImageButton);
         accountInfoButton.setOnClickListener(new View.OnClickListener() 
         {	
 			@Override
 			public void onClick(View v) 
 			{
+				AlphaAnimation alphaDown = new AlphaAnimation(1.0f, 0.3f);
+			    AlphaAnimation alphaUp = new AlphaAnimation(0.3f, 1.0f);
+			    alphaDown.setDuration(1000);
+			    alphaUp.setDuration(500);
+			    alphaDown.setFillAfter(true);
+			    alphaUp.setFillAfter(true);
+			    v.startAnimation(alphaUp);	
+			    
 		        Bundle extras = getIntent().getExtras();
-		        String strvalue= extras.getString("username");        
-				Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);
-				
+		        String strvalue= extras.getString("username");
+		        String intent = "MainActivity";
+				Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);				
 				profileIntent.putExtra("message", strvalue);
+				profileIntent.putExtra("intent", intent);
+				profileIntent.putExtra("visibility", user.getVisibility());
 				startActivity(profileIntent);			
-				System.out.println(strvalue);
 			}
 		});
         
@@ -233,6 +288,14 @@ public class MainActivity extends MapActivity implements LocationListener
         {
             public void onClick(View v) 
             {   
+				AlphaAnimation alphaDown = new AlphaAnimation(1.0f, 0.3f);
+			    AlphaAnimation alphaUp = new AlphaAnimation(0.3f, 1.0f);
+			    alphaDown.setDuration(1000);
+			    alphaUp.setDuration(500);
+			    alphaDown.setFillAfter(true);
+			    alphaUp.setFillAfter(true);
+			    v.startAnimation(alphaUp);	
+			    
             	List<Overlay> mapOverlays = mapView.getOverlays();
                 CustomItemizedOverlay itemizedoverlay = (CustomItemizedOverlay) mapOverlays.get(0);
             	
@@ -314,6 +377,14 @@ public class MainActivity extends MapActivity implements LocationListener
         {
 			public void onClick(View v) 
 			{
+				AlphaAnimation alphaDown = new AlphaAnimation(1.0f, 0.3f);
+			    AlphaAnimation alphaUp = new AlphaAnimation(0.3f, 1.0f);
+			    alphaDown.setDuration(1000);
+			    alphaUp.setDuration(500);
+			    alphaDown.setFillAfter(true);
+			    alphaUp.setFillAfter(true);
+			    v.startAnimation(alphaUp);	
+			    
 				 // Create new entry for the database and when the location is changed put those values in the db.
 		        LocationsHandling locEntry = new LocationsHandling(MainActivity.this);
 		        Bundle extras = getIntent().getExtras();

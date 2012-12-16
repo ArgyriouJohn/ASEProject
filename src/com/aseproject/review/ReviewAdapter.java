@@ -1,10 +1,16 @@
 package com.aseproject.review;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
+import com.aseproject.login.UserAuth;
 import com.aseproject.map.R;
 import com.aseproject.profile.ProfileActivity;
+import com.aseproject.utilities.User;
 import com.aseproject.utilities.Utils;
 import com.aseproject.utilities.WebServiceConnector;
 import android.app.Activity;
@@ -20,12 +26,13 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-public class ReviewAdapter extends ArrayAdapter<Review>
+public class ReviewAdapter extends ArrayAdapter<ReviewBitmap>
 {
 	private Activity activity; 
-    ArrayList<Review> data;
+    ArrayList<ReviewBitmap> data;
+	String intent = "ReviewAdapter";
    
-    public ReviewAdapter(Activity activity, int layoutResourceId,ArrayList<Review> reviewList) 
+    public ReviewAdapter(Activity activity, int layoutResourceId,ArrayList<ReviewBitmap> reviewList) 
     {
         super(activity, layoutResourceId, reviewList);
         this.activity = activity;
@@ -40,7 +47,7 @@ public class ReviewAdapter extends ArrayAdapter<Review>
     	LayoutInflater vi =(LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         v = vi.inflate(R.layout.review_list_item,null);
 
-        final Review review = data.get(position);
+        final ReviewBitmap review = data.get(position);
 
         ImageView iv = (ImageView)v.findViewById(R.id.ReviewIcon);
         iv.setOnClickListener(new View.OnClickListener() 
@@ -49,8 +56,14 @@ public class ReviewAdapter extends ArrayAdapter<Review>
 			@Override
 			public void onClick(View v) 
 			{
+
+				User entry = new User(activity);
+				entry.open();
+				final UserAuth user = entry.retrieveProfileInfo(review.getUsername());
 				Intent profileIntent = new Intent(activity, ProfileActivity.class);
 				profileIntent.putExtra("message", review.getUsername());
+				profileIntent.putExtra("intent", intent);
+				entry.close();
 				activity.startActivity(profileIntent);
 			}
 		});
@@ -70,21 +83,21 @@ public class ReviewAdapter extends ArrayAdapter<Review>
         final int dislikes =review.getDislikes();
             
         rn.setText(username);
-        rt.setText(reviewText);        
+        Timestamp date = review.getTimeDate();        
+        SimpleDateFormat filter = new SimpleDateFormat ("dd-MM-yy");
+        rt.setText(reviewText+" at "+filter.format(date));        
         rr.setRating(rating);
         like.setText(String.valueOf(likes));
         dislike.setText(String.valueOf(dislikes));
         
         if(!profilePic.equals(""))
         {
-	        Bitmap userPic = Utils.decodeImage(profilePic);
-	        Bitmap resizedPic = Utils.resizeBitmap(userPic, userPic.getWidth()/5*2,userPic.getHeight()/5*2);
-	        iv.setImageBitmap(resizedPic);
+	        iv.setImageBitmap(review.getProfilePicBitmap());
         }
         else
         {
         	iv.setImageResource(R.drawable.android96);
-        }
+        }   
         
         ImageButton LikeButton =(ImageButton) v.findViewById(R.id.LikeButton);
 		
@@ -95,7 +108,10 @@ public class ReviewAdapter extends ArrayAdapter<Review>
 				WebServiceConnector ws = new WebServiceConnector();
 				try 
 				{
-					System.out.println("Updated likes: "+ws.getReviewResponse(username,location,reviewText,rating,likes+1,dislikes));
+  					Calendar cal = Calendar.getInstance();
+  				    Date utilDate = cal.getTime();
+  					Timestamp sqlDate = new  Timestamp(utilDate.getTime());
+					System.out.println("Updated likes: "+ws.getReviewResponse(username,location,reviewText,rating,likes+1,dislikes,sqlDate));
 				} 
 				catch (IOException e) {e.printStackTrace();}
 			}
@@ -110,7 +126,10 @@ public class ReviewAdapter extends ArrayAdapter<Review>
 				WebServiceConnector ws = new WebServiceConnector();
 				try 
 				{
-					System.out.println("Updated dislikes: "+ws.getReviewResponse(username,location,reviewText,rating,likes,dislikes+1));
+					Calendar cal = Calendar.getInstance();
+  				    Date utilDate = cal.getTime();
+  					Timestamp sqlDate = new  Timestamp(utilDate.getTime());
+					System.out.println("Updated dislikes: "+ws.getReviewResponse(username,location,reviewText,rating,likes,dislikes+1,sqlDate));
 				} 
 				catch (IOException e) {e.printStackTrace();}
 			}

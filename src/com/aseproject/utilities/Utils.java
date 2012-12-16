@@ -51,11 +51,7 @@ public class Utils
     			try 
     			{
     				placeDetails = googlePlaces.getPlaceDetails(place.reference);
-				} catch (Exception e) 
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				} catch (Exception e) {e.printStackTrace();}
     		}
     	}
 		return placeDetails;
@@ -159,7 +155,7 @@ public class Utils
 		   public void run() 
 		   {
 			   new ReviewListTask(location,activity).execute();
-			   reviewThread.postDelayed(this,3000);	
+			   reviewThread.postDelayed(this,4000);	
 		   }
 		};
 		reviewThread.postDelayed(runnable, 0);
@@ -174,7 +170,7 @@ public class Utils
 		   public void run() 
 		   {
 			   new CheckInListTask(location,activity).execute();
-			   checkInThread.postDelayed(this,3000);	
+			   checkInThread.postDelayed(this,4000);	
 		   }
 		};
 		checkInThread.postDelayed(runnable, 0);	
@@ -198,13 +194,13 @@ public class Utils
 		// calculate the scale - in this case = 0.4f
 		float scaleWidth = ((float) newWidth) / width;
 		float scaleHeight = ((float) newHeight) / height;
-					// create a matrix for the manipulation
-			Matrix matrix = new Matrix();
+		// create a matrix for the manipulation
+		Matrix matrix = new Matrix();
 			
-			// resize the bit map
-			matrix.postScale(scaleWidth, scaleHeight);
-			//recreate the new Bitmap
-			return Bitmap.createBitmap(input, 0, 0,width, height, matrix, true);				
+		// resize the bit map
+		matrix.postScale(scaleWidth, scaleHeight);
+		//recreate the new Bitmap
+		return Bitmap.createBitmap(input, 0, 0,width, height, matrix, true);				
 	}
 	
 	public static Bitmap getRoundedCornerBitmap(Bitmap bitmap,int pixels)

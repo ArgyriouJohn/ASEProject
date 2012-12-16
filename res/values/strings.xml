@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">ASE Project</string>
@@ -16,5 +17,6 @@
     <string name="likeCount">lt</string>
     <string name="dislikeCount">dt</string>
     <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_profile_activity2">ProfileActivity2</string>
 
 </resources>

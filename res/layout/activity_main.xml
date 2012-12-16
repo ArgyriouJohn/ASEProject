@@ -35,45 +35,28 @@
                 android:id="@+id/imageView1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="TODO"
                 android:gravity="right"
                 android:src="@android:drawable/ic_menu_gallery" />
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
-                android:layout_marginTop="10dip"
-                android:text="@string/address_field"
-                android:textColor="#95FFFFFF"
-                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/name"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dip"
                 android:textColor="#95FFFFFF" />
 
             <TextView
+                android:id="@+id/address"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dip"
-                android:layout_marginTop="15dip"
-                android:text="@string/address_field"
-                android:textColor="#95FFFFFF"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/address"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
                 android:textColor="#95FFFFFF" />
 
             <TextView
                 android:id="@+id/phone"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dip"
+                android:layout_marginBottom="5dip"
                 android:textColor="#95FFFFFF" />
 
             <!-- Location Value -->
@@ -83,7 +66,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dip"
-                android:layout_marginTop="15dip"
+                android:layout_marginTop="5dip"
                 android:textColor="#95FFFFFF" />
 
             <TabHost
@@ -170,14 +153,6 @@
         android:padding="0px"
         android:weightSum="1" >
 
-        <ImageButton
-            android:id="@+id/imageButton4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.2"
-            android:background="#00000000"
-            android:src="@android:drawable/ic_menu_view" />
-
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -217,15 +192,26 @@
             android:src="@android:drawable/ic_menu_set_as" />                
             
     </LinearLayout>
-    
-    <ImageButton
-	    android:id="@+id/imageButton3"
-	    android:layout_width="50dp"
-	    android:layout_height="50dp"
-	    android:layout_above="@+id/LinearLayout1"
-	    android:layout_alignParentTop="true"
-	    android:background="#00000000"
-	    android:scaleType="center"
-	    android:src="@android:drawable/ic_menu_myplaces" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <ImageButton
+            android:id="@+id/showProfileImageButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="#00000000"
+            android:scaleType="center"
+            android:src="@android:drawable/ic_menu_myplaces" />
+
+        <ImageButton
+            android:id="@+id/visInvisImmageButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="#00000000"
+            android:scaleType="center" />
+
+    </LinearLayout>
 
 </RelativeLayout>

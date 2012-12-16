@@ -6,14 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.aseproject.login.LoginActivity;
-import com.aseproject.login.User;
-import com.aseproject.login.UserAuth;
-import com.aseproject.map.R;
-import com.aseproject.review.Review;
-import com.aseproject.utilities.Utils;
-import com.aseproject.utilities.WebServiceConnector;
-import com.aseproject.checkin.CheckIn;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -26,7 +18,6 @@ import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -35,7 +26,6 @@ import android.util.Base64;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -46,9 +36,20 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aseproject.checkin.CheckIn;
+import com.aseproject.login.LoginActivity;
+import com.aseproject.login.UserAuth;
+import com.aseproject.map.MainActivity;
+import com.aseproject.map.R;
+import com.aseproject.review.Review;
+import com.aseproject.utilities.User;
+import com.aseproject.utilities.Utils;
+import com.aseproject.utilities.WebServiceConnector;
+
 @SuppressLint("NewApi")
 public class ProfileActivity extends Activity 
 {	
+	//Profile fields
 	EditText firstName, lastName;
 	ImageButton editProfileButton;
 	ImageButton deleteProfileButton;
@@ -76,6 +77,7 @@ public class ProfileActivity extends Activity
 	private ArrayList<CheckIn> checkInList = new  ArrayList<CheckIn>();
 	private ArrayList<Review> reviewList =new  ArrayList<Review>();
 	private WebServiceConnector ws = new WebServiceConnector();		
+	String pushedUsername;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +86,15 @@ public class ProfileActivity extends Activity
 		
 		Bundle extras = getIntent().getExtras();
         final String strvalue = extras.getString("message");
+        final String pushedIntent = extras.getString("intent");
         
+        if(pushedIntent.equals("ReviewAdapter") || pushedIntent.equals("CheckInAdapter")) {
+        	Intent profile2Intent = new Intent(ProfileActivity.this, ProfileActivity2.class);
+        	profile2Intent.putExtra("username", strvalue);
+        	startActivity(profile2Intent);
+        	finish();
+        }
+
         ProfileCheckInsView = (ListView) findViewById(R.id.ProfileCheckInsView);
         ProfileReviewsView = (ListView) findViewById(R.id.ProfileReviewsView);
         firstName = (EditText) findViewById(R.id.firstName);
@@ -93,14 +103,13 @@ public class ProfileActivity extends Activity
 		lastName.setFocusable(false);
 		firstName.setEnabled(false);
 		lastName.setEnabled(false);	
-//		femaleRadioButton.setSelected(false);
-//		maleRadioButton.setSelected(false);		
     	pic = (ImageView) findViewById(R.id.profileImageButton);
         		
         User entry = new User(ProfileActivity.this);
         entry.open();
         final UserAuth user = entry.retrieveProfileInfo(strvalue);         
         entry.close();
+        
         
         //GET AND DISPLAY USER CHECKINS & REVIEWS
 		try {
@@ -254,13 +263,13 @@ public class ProfileActivity extends Activity
 						pic.buildDrawingCache(true);
 						Bitmap profilePic = ((BitmapDrawable) pic.getDrawable()).getBitmap();
 						ByteArrayOutputStream baos = new  ByteArrayOutputStream();		
-						profilePic = Utils.resizeBitmap(profilePic, 256, 256);
+						//profilePic = Utils.resizeBitmap(profilePic, 256, 256);
 						profilePic.compress(Bitmap.CompressFormat.PNG,100, baos);
 						byte [] b=baos.toByteArray();						
 						temp = Base64.encodeToString(b, Base64.DEFAULT);		
 			        	Utils.setImgTemp(temp);
 			        	System.out.println("PIC RE");
-			        	System.out.println(entry.updateUserInfo(strvalue, firstName.getText().toString(), lastName.getText().toString(), radioButtonValue, myYear, myMonth+1, myDay, temp));			        	
+			        	System.out.println(entry.updateUserInfo(strvalue, firstName.getText().toString(), lastName.getText().toString(), radioButtonValue, myYear, myMonth+1, myDay, temp, 1));			        	
 					}
 					
 		        	entry.close();
@@ -435,7 +444,7 @@ public class ProfileActivity extends Activity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_profile, menu);
+			getMenuInflater().inflate(R.menu.activity_profile, menu);		
 		return true;
 	}
 	

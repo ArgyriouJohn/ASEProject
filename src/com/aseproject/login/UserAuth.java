@@ -14,6 +14,7 @@ public class UserAuth implements Serializable {
 	private int month;
 	private int day;	
 	private String profilePic;
+	private int isInvis;
 	
 	public UserAuth() {				
 	}
@@ -35,7 +36,12 @@ public class UserAuth implements Serializable {
 		this.username = username;
 	}
 	
-	public UserAuth(String username, String first, String last, String gen, int d, int m, int y,String profilePic) 
+	public UserAuth(String username, int visInvis) {
+		this.username = username;
+		this.isInvis = visInvis;
+	}
+	
+	public UserAuth(String username, String first, String last, String gen, int d, int m, int y,String profilePic, int visibility) 
 	{
 		this.username = username;
 		this.firstName = first;
@@ -45,6 +51,7 @@ public class UserAuth implements Serializable {
 		this.month = m;
 		this.day = y;
 		this.profilePic = profilePic;
+		this.isInvis = visibility;
 	}
 	
 	public UserAuth(String username, String first, String last, String gen, int d, int m, int y) 
@@ -96,6 +103,10 @@ public class UserAuth implements Serializable {
 	
 	public String getPicture() {
 		return profilePic;
+	}
+	
+	public int getVisibility() {
+		return isInvis;
 	}
 
 }

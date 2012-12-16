@@ -1,6 +1,7 @@
 package com.aseproject.map;
 
 import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -12,16 +13,15 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
 import android.widget.LinearLayout;
 
-import com.aseproject.login.User;
 import com.aseproject.login.UserAuth;
 import com.aseproject.places.GooglePlaces;
 import com.aseproject.places.PlaceDetails;
 import com.aseproject.places.PlacesList;
+import com.aseproject.utilities.User;
 import com.aseproject.utilities.Utils;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
@@ -81,15 +81,14 @@ public class CustomItemizedOverlay extends ItemizedOverlay
     
 	    if(userPic!=null)
 	    {
-	    	Bitmap resizedPic = Utils.resizeBitmap(userPic, 128, 128);
-		    Bitmap roundedPic = Utils.getRoundedCornerBitmap(resizedPic,64);	    	
+	    	Bitmap resizedPic = Utils.resizeBitmap(userPic, 110, 110);
+		    Bitmap roundedPic = Utils.getRoundedCornerBitmap(resizedPic,48);	    	
 	    	mOverlays.get(0).setMarker(boundCenterBottom(new BitmapDrawable(mContext.getResources(),roundedPic)));
 	    }
 	    else
 	    {
 	    	mOverlays.get(0).setMarker(boundCenterBottom(mContext.getResources().getDrawable(R.drawable.android96)));
 	    }
-
 	    populate();
 	}
 	
@@ -109,8 +108,8 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 	    
 	    if(userPic!=null)
 	    {
-	    	Bitmap resizedPic = Utils.resizeBitmap(userPic, 128, 128);
-		    Bitmap roundedPic = Utils.getRoundedCornerBitmap(resizedPic,64);
+	    	Bitmap resizedPic = Utils.resizeBitmap(userPic, 110, 110);
+		    Bitmap roundedPic = Utils.getRoundedCornerBitmap(resizedPic,48);
 	    	mOverlays.get(0).setMarker(boundCenterBottom(new BitmapDrawable(mContext.getResources(),roundedPic)));
 	    }
 	    else
@@ -316,8 +315,8 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 	 public void setPicturePic(String pic)
 	 {
 		 	userPic = Utils.decodeImage(pic); 
-		 	Bitmap resizedPic = Utils.resizeBitmap(userPic, 128, 128);
-		    Bitmap roundedPic = Utils.getRoundedCornerBitmap(resizedPic,64);
+		 	Bitmap resizedPic = Utils.resizeBitmap(userPic, 110, 110);
+		    Bitmap roundedPic = Utils.getRoundedCornerBitmap(resizedPic,48);
 	    	mOverlays.get(0).setMarker(boundCenterBottom(new BitmapDrawable(mContext.getResources(),roundedPic)));
 	 }
 }

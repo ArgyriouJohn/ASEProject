@@ -25,26 +25,28 @@ import com.aseproject.review.Review;
 
 public class WebServiceConnector
 {
-	private static final String NAMESPACE = "http://com.aseserver.server";
+	private static final String NAMESPACE = "http://server.aseserver.com";
 	private static String URL = "http://54.243.147.122:8080/ASEServer/services/ASEProjectServices?wsdl"; 
-	private static final String METHOD_NAME = "login";
-	private static final String METHOD_NAME1 = "update";
-	private static final String METHOD_NAME2 = "getLocations";
-	private static final String METHOD_NAME3 = "checkIn";
+	private static final String METHOD_NAME = "loginOrRegister";
+	private static final String METHOD_NAME1 = "updateProfile";
+	private static final String METHOD_NAME2 = "addLocations";
+	private static final String METHOD_NAME3 = "addCheckIn";
 	private static final String METHOD_NAME4 = "getCheckIns";
-	private static final String METHOD_NAME5 = "getReview";
-	private static final String METHOD_NAME6 = "review";
-	private static final String METHOD_NAME7 = "delete";
+	private static final String METHOD_NAME5 = "getReviews";
+	private static final String METHOD_NAME6 = "addReview";
+	private static final String METHOD_NAME7 = "deleteProfile";
 	private static final String METHOD_NAME8 = "retrieveProfile";
-	private static final String SOAP_ACTION = NAMESPACE+"/login";
-	private static final String SOAP_ACTION1 = NAMESPACE+"pkg/update";
-	private static final String SOAP_ACTION2 = NAMESPACE+"/getLocations";
-	private static final String SOAP_ACTION3 = NAMESPACE+"/checkIn";
-	private static final String SOAP_ACTION4 = NAMESPACE+"/getCheckIns";
-	private static final String SOAP_ACTION5 = NAMESPACE+"/getReview";
-	private static final String SOAP_ACTION6 = NAMESPACE+"/review";
-	private static final String SOAP_ACTION7 = NAMESPACE+"/delete";
-	private static final String SOAP_ACTION8 = NAMESPACE+"/retrieveProfile";
+	private static final String METHOD_NAME9 = "addVisibility";
+	private static final String SOAP_ACTION = NAMESPACE+"/"+METHOD_NAME;
+	private static final String SOAP_ACTION1 = NAMESPACE+"/"+METHOD_NAME1;
+	private static final String SOAP_ACTION2 = NAMESPACE+"/"+METHOD_NAME2;
+	private static final String SOAP_ACTION3 = NAMESPACE+"/"+METHOD_NAME3;
+	private static final String SOAP_ACTION4 = NAMESPACE+"/"+METHOD_NAME4;
+	private static final String SOAP_ACTION5 = NAMESPACE+"/"+METHOD_NAME5;
+	private static final String SOAP_ACTION6 = NAMESPACE+"/"+METHOD_NAME6;
+	private static final String SOAP_ACTION7 = NAMESPACE+"/"+METHOD_NAME7;
+	private static final String SOAP_ACTION8 = NAMESPACE+"/"+METHOD_NAME8;
+	private static final String SOAP_ACTION9 = NAMESPACE+"/"+METHOD_NAME9;
 		
 	private String initializeStuff(Object o, String methodName, String soapAction) throws IOException 
 	{
@@ -88,9 +90,9 @@ public class WebServiceConnector
 	    return initializeStuff(authData, METHOD_NAME, SOAP_ACTION);
 	}
 	
-	public String getUpdateResponse(String username, String firstName, String lastName, String gender, int day, int month, int year, String image) throws IOException
+	public String getUpdateResponse(String username, String firstName, String lastName, String gender, int day, int month, int year, String image, int visibility) throws IOException
 	{
-		UserAuth updateData = new UserAuth(username, firstName, lastName, gender, day, month, year, image);
+		UserAuth updateData = new UserAuth(username, firstName, lastName, gender, day, month, year, image, visibility);
 		return initializeStuff(updateData, METHOD_NAME1, SOAP_ACTION1);
 	}
 	
@@ -98,6 +100,12 @@ public class WebServiceConnector
 	{
 		UserAuth updateData = new UserAuth(username);
 		return initializeStuff(updateData, METHOD_NAME7, SOAP_ACTION7);
+	}
+	
+	public String getVisibilityChangeResponse(String username, int visibility) throws IOException
+	{
+		UserAuth updateData = new UserAuth(username, visibility);
+		return initializeStuff(updateData, METHOD_NAME9, SOAP_ACTION9);
 	}
 	
 	public String getLocResponse(String username, Double longitude, Double latitude) throws IOException
@@ -112,9 +120,9 @@ public class WebServiceConnector
 		return initializeStuff(checkInData, METHOD_NAME3, SOAP_ACTION3);		
 	}
 	
-	public String getReviewResponse(String username, String location, String reviewText, int rating,int likes,int dislikes) throws IOException
+	public String getReviewResponse(String username, String location, String reviewText, int rating,int likes,int dislikes,Timestamp sqlDate) throws IOException
 	{		 
-		Review reviewData = new Review(username, location, reviewText, rating,likes,dislikes); 		
+		Review reviewData = new Review(username, location, reviewText, rating,likes,dislikes,sqlDate); 		
 	    return initializeStuff(reviewData, METHOD_NAME6, SOAP_ACTION6);
 	}
 	

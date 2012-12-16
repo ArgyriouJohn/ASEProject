@@ -2,6 +2,7 @@ package com.aseproject.login;
 
 import com.aseproject.map.MainActivity;
 import com.aseproject.map.R;
+import com.aseproject.utilities.User;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -65,9 +66,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 				//String email = sqlEmail.getText().toString();
 				
 				User entry = new User(LoginActivity.this);
-				entry.open();
-				System.out.println("USERAS: " + entry.getUsername(username));
-				
+				entry.open();				
 				if(didItWork == entry.checkUserLogin(username, password)) {
 			        Toast toast = Toast.makeText(getBaseContext(), "You are now logged in.", Toast.LENGTH_LONG);
 					Intent mapIntent = new Intent(LoginActivity.this, MainActivity.class);

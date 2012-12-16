@@ -2,6 +2,9 @@ package com.aseproject.review;
 
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -42,21 +45,23 @@ public class ReviewDialog extends Activity {
       		        String userValue = intent.getStringExtra("userName");
       		        System.out.println(locValue+userValue);
 
-      				if (review.equals("") || review.equals(null)) {	
+      				if (review.equals("") || review.equals(null)) 
+      				{	
 //    			        Toast toast = Toast.makeText(getBaseContext(), "Please type your review first!", Toast.LENGTH_LONG);
 //                  		new AlertDialog.Builder(getBaseContext()).setTitle("Info").setMessage("Please type your review first!").setIcon(R.drawable.warning).setNeutralButton("Ok", null).show();
-      				} else {
-      					
-      				try {
-  
-      					WebServiceConnector ws = new WebServiceConnector();
-      					System.out.println("Created Review: " + ws.getReviewResponse(userValue, locValue, textReview.getText().toString(), (int)reviewRating.getRating(),0,0));
-      					} catch (IOException e) {
-      					// TODO Auto-generated catch block
-      					e.printStackTrace();
-      					}
-    			        finish();
-      				}
+      				} 
+      				else 
+      				{      					
+      					try 
+	      				{
+	      					WebServiceConnector ws = new WebServiceConnector();
+	      					Calendar cal = Calendar.getInstance();
+	      				    Date utilDate = cal.getTime();
+	      					Timestamp sqlDate = new  Timestamp(utilDate.getTime());
+	      					System.out.println("Created Review: " + ws.getReviewResponse(userValue, locValue, textReview.getText().toString(), (int)reviewRating.getRating(),0,0,sqlDate));
+	      					} catch (IOException e) {e.printStackTrace();}
+	    			        finish();
+	      				}
       			}
       		});
       		

@@ -19,12 +19,13 @@ import com.aseproject.map.R;
 import com.aseproject.profile.ProfileActivity;
 import com.aseproject.utilities.Utils;
 
-public class CheckInAdapter extends ArrayAdapter<CheckIn>
+public class CheckInAdapter extends ArrayAdapter<CheckInBitmap>
 {
 	private Activity activity; 
-    ArrayList<CheckIn> data;
+    ArrayList<CheckInBitmap> data;
+	String intent = "CheckInAdapter";
    
-    public CheckInAdapter(Activity activity, int layoutResourceId,ArrayList<CheckIn> checkInList) 
+    public CheckInAdapter(Activity activity, int layoutResourceId,ArrayList<CheckInBitmap> checkInList) 
     {
         super(activity, layoutResourceId, checkInList);
         this.activity = activity;
@@ -35,7 +36,7 @@ public class CheckInAdapter extends ArrayAdapter<CheckIn>
     public View getView(int position, View convertView, ViewGroup parent) 
     {
         View v = convertView;
-        final CheckIn checkIn = data.get(position);
+        final CheckInBitmap checkIn = data.get(position);
     	LayoutInflater vi =(LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         v = vi.inflate(R.layout.checkin_list_item,null);
            
@@ -47,6 +48,7 @@ public class CheckInAdapter extends ArrayAdapter<CheckIn>
 			{
 				Intent profileIntent = new Intent(activity, ProfileActivity.class);
 				profileIntent.putExtra("message", checkIn.getUsername());
+				profileIntent.putExtra("intent", intent);
 				activity.startActivity(profileIntent);
 			}
 		});
@@ -64,9 +66,7 @@ public class CheckInAdapter extends ArrayAdapter<CheckIn>
         
         if(!profilePic.equals(""))
         {
-	        Bitmap userPic = Utils.decodeImage(checkIn.getProfilePic());
-	        Bitmap resizedPic = Utils.resizeBitmap(userPic, userPic.getWidth()/5*2,userPic.getHeight()/5*2);
-	        iv.setImageBitmap(resizedPic);
+	        iv.setImageBitmap(checkIn.getProfilePicBitmap());
         }
         else
         {

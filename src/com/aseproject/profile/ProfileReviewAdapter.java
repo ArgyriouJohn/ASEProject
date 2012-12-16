@@ -1,7 +1,11 @@
 package com.aseproject.profile;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import com.aseproject.map.R;
 import com.aseproject.review.Review;
@@ -52,7 +56,9 @@ public class ProfileReviewAdapter extends ArrayAdapter<Review>
         final int dislikes =review.getDislikes();
             
         rn.setText(username);
-        rt.setText(reviewText);
+        Timestamp date = review.getTimeDate();        
+        SimpleDateFormat filter = new SimpleDateFormat ("dd-MM-yy");
+        rt.setText(reviewText+" at "+filter.format(date));
         rr.setRating(rating);
         like.setText(String.valueOf(likes));
         dislike.setText(String.valueOf(dislikes));
@@ -66,8 +72,10 @@ public class ProfileReviewAdapter extends ArrayAdapter<Review>
 				WebServiceConnector ws = new WebServiceConnector();
 				try 
 				{
-					System.out.println(likes);
-					System.out.println("Updated likes: "+ws.getReviewResponse(username,location,reviewText,rating,likes+1,dislikes));
+					Calendar cal = Calendar.getInstance();
+  				    Date utilDate = cal.getTime();
+  					Timestamp sqlDate = new  Timestamp(utilDate.getTime());
+					System.out.println("Updated likes: "+ws.getReviewResponse(username,location,reviewText,rating,likes+1,dislikes,sqlDate));
 				} 
 				catch (IOException e) {e.printStackTrace();}
 			}
@@ -82,7 +90,10 @@ public class ProfileReviewAdapter extends ArrayAdapter<Review>
 				WebServiceConnector ws = new WebServiceConnector();
 				try 
 				{
-					System.out.println("Updated dislikes: "+ws.getReviewResponse(username,location,reviewText,rating,likes,dislikes+1));
+					Calendar cal = Calendar.getInstance();
+  				    Date utilDate = cal.getTime();
+  					Timestamp sqlDate = new  Timestamp(utilDate.getTime());
+					System.out.println("Updated dislikes: "+ws.getReviewResponse(username,location,reviewText,rating,likes,dislikes+1,sqlDate));
 				} 
 				catch (IOException e) {e.printStackTrace();}
 			}
