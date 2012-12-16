@@ -1,11 +1,9 @@
 package com.example.ase_map;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
@@ -16,59 +14,93 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.Settings;
+import android.provider.SyncStateContract.Constants;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
+import android.view.animation.Animation.AnimationListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
+
 
 public class MainActivity extends MapActivity implements LocationListener 
 {
 	private MapView mapView;
 	private MapController mapController;
 	private LocationManager locationManager;
+	
 	private String provider;
+	private String posStatus;
+	
 	double latitude;
     double longitude;
+    
     GooglePlaces googlePlaces = new GooglePlaces();
     PlacesList nearPlaces;
     PlaceDetails placeDetails;
-    Button button;
     
-    // Places Listview
-    ListView lv;
-    LinearLayout ll;
-
+    ImageButton logOutButton;
+    ImageButton showNearLocButton;
     
+    TextView date;
+    ListView placesListView;
+    LinearLayout placeLayoutDetails;
+    
+    Date dNow;
+	
     @SuppressLint("NewApi")
-	@Override
+    @Override
     public void onCreate(Bundle savedInstanceState) 
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        //Set loose policy.
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitNetwork().build();
         StrictMode.setThreadPolicy(policy);
         
+        //Retrieve and show date.
+        dNow = new Date( );
+        SimpleDateFormat days = new SimpleDateFormat ("dd.MM.yy");
+	    date = (TextView) findViewById(R.id.textView1);
+	    date.setText(days.format(dNow));
+	    
+        if (isOnline())
+        {
+            System.out.println("INTERNET's FINE"); 
+        }
+        else 
+        { 
+            try 
+            {
+            	new AlertDialog.Builder(getBaseContext()).setTitle("Info").setMessage("No internet connection."+"\n"
+            		+ "Please check your internet settings!").setIcon(R.drawable.warning).setNeutralButton("Ok", null).show();
+            }
+            catch(Exception e) 
+            {
+            	Log.d(Constants.ACCOUNT_NAME, "Show Dialog: "+e.getMessage());
+            }
+        }
+                       
         // Get the location manager
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -104,96 +136,49 @@ public class MainActivity extends MapActivity implements LocationListener
         
         // Dispalay an itemizedoverlay on the map.
         List<Overlay> mapOverlays = mapView.getOverlays();	
-        Drawable drawable = this.getResources().getDrawable(R.drawable.android96);
-        CustomItemizedOverlay itemizedoverlay = new CustomItemizedOverlay(drawable, this);
+        Drawable drawable = this.getResources().getDrawable(R.drawable.bmarker);
+        CustomItemizedOverlay itemizedoverlay = new CustomItemizedOverlay(drawable, this,placeLayoutDetails,placeDetails, nearPlaces, googlePlaces);
         OverlayItem overlayitem = new OverlayItem(point," "," ");
         itemizedoverlay.addOverlay(overlayitem);
         mapOverlays.add(itemizedoverlay);
         
      // Getting listview
-        lv = (ListView) findViewById(R.id.listView1);
+        placesListView = (ListView) findViewById(R.id.listView1);
         
-        ll = (LinearLayout) findViewById(R.id.LinearLayout2);
-        ll.setVisibility(View.INVISIBLE);
+        placeLayoutDetails = (LinearLayout) findViewById(R.id.LinearLayout2);
+        placeLayoutDetails.setVisibility(View.INVISIBLE);
         
-        lv.setOnItemClickListener(new OnItemClickListener()
+        placesListView.setOnItemClickListener(new OnItemClickListener()
         {
         	public void onItemClick(AdapterView<?> parent, View view,int position, long id) 
         	{
 	        		String placeName = ((TextView) view).getText().toString();
-	        		for(Place place : nearPlaces.results)
-	            	{
-	            		if(place.name.equals(placeName))
-	            		{
-	            			try {
-	            				placeDetails = googlePlaces.getPlaceDetails(place.reference);
-							} catch (Exception e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-	            		}
-	            	}
-	        		 
-	        		ll.setVisibility(View.VISIBLE);
-	        		 
-	        		TranslateAnimation anim = new TranslateAnimation(300,0,0,0);
-	            	anim.setDuration(1000);
-	            	anim.setFillAfter(true);
-	            	ll.startAnimation(anim);
-	            	
-					String name = placeDetails.result.name;
-                    String address = placeDetails.result.formatted_address;
-				    String phone = placeDetails.result.formatted_phone_number;
-                    String latitude = Double.toString(placeDetails.result.geometry.location.lat);
-                    String longitude = Double.toString(placeDetails.result.geometry.location.lng);
-                    String imgURL = placeDetails.result.icon;
-                    
-                    TextView lbl_name = (TextView) findViewById(R.id.name);
-                    TextView lbl_address = (TextView) findViewById(R.id.address);
-                    TextView lbl_phone = (TextView) findViewById(R.id.phone);
-                    TextView lbl_location = (TextView) findViewById(R.id.location);
-                    ImageView lbl_img= (ImageView) findViewById(R.id.imageView1);
-                    
-                    name = name == null ? "Not present" : name; // if name is null display as "Not present"
-                    address = address == null ? "Not present" : address;
-                    phone = phone == null ? "Not present" : phone;
-                    latitude = latitude == null ? "Not present" : latitude;
-                    longitude = longitude == null ? "Not present" : longitude;
-
-                    lbl_name.setText(name);
-                    lbl_address.setText(address);
-                    lbl_phone.setText(Html.fromHtml("<b>Phone:</b> " + phone));
-                    lbl_location.setText(Html.fromHtml("<b>Latitude:</b> " + latitude + ", <b>Longitude:</b> " + longitude));
-                    
-                    URL newurl;
-					try 
-					{
-						newurl = new URL("http://maps.googleapis.com/maps/api/streetview?size=400x400&location="+latitude+","+longitude+"+&sensor=false");
-						//newurl = new URL("http://maps.googleapis.com/maps/api/streetview?size=400x400&location="+name+"+&heading=235&sensor=false");
-						Bitmap bitmap = BitmapFactory.decodeStream(newurl.openConnection() .getInputStream()); 
-						lbl_img.setImageBitmap(bitmap);
-					} catch (MalformedURLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} 
+	        		placeDetails = Utils.getPlaceDetails(placeName, nearPlaces, googlePlaces);
+        			
+	        		if(placeLayoutDetails.getVisibility()==View.INVISIBLE)
+	        		{
+		        		TranslateAnimation anim = new TranslateAnimation(300,0,0,0);
+		            	anim.setDuration(1000);
+		            	anim.setFillAfter(true);
+		            	placeLayoutDetails.startAnimation(anim);
+	        		}
+	        		placeLayoutDetails.setVisibility(View.VISIBLE);
+	            	Utils.createPlaceInfo(placeLayoutDetails,placeDetails,MainActivity.this);
              }
         });
         
-        button = (Button) findViewById(R.id.button1);
-        button.setOnClickListener(new View.OnClickListener() 
+        posStatus = "Show";
+        showNearLocButton = (ImageButton) findViewById(R.id.imageButton1);
+        showNearLocButton.setOnClickListener(new View.OnClickListener() 
         {
             public void onClick(View v) 
             {              	
-            	button.setTextColor(-16777216);           	
-            	if(button.getText().equals("Show Nearest Places")||button.getText().equals("Update Nearest Places"))
+            	if(posStatus.equals("Show")||posStatus.equals("Update"))
             	{	
 	            	try 
 	            	{
 						nearPlaces = googlePlaces.search(latitude, longitude,500,null);
-						button.setText("Hide Nearest Places");
+						posStatus="Hide";
 					} 
 	            	catch (Exception e) 
 					{
@@ -201,25 +186,41 @@ public class MainActivity extends MapActivity implements LocationListener
 						e.printStackTrace();
 					}
 	                ArrayList<String> placesNames = new ArrayList<String>();
+	                
+	                List<Overlay> mapOverlays = mapView.getOverlays();
+	                CustomItemizedOverlay itemizedoverlay = (CustomItemizedOverlay) mapOverlays.get(0);
+	                
 	            	for(Place place : nearPlaces.results)
 	            	{
 	            		placesNames.add(place.name);
+	            		GeoPoint geoPoint = new GeoPoint((int) (place.geometry.location.lat * 1E6),(int) (place.geometry.location.lng * 1E6));
+	            		
+	            		OverlayItem overlayitem = new OverlayItem(geoPoint, place.name,place.vicinity);
+	            		itemizedoverlay.addOverlay(overlayitem);
 	            	}
+	            	itemizedoverlay.setPlaceDetails(placeDetails);
+	            	itemizedoverlay.setNearPlaces(nearPlaces);
+	            	mapOverlays.set(0,itemizedoverlay);
+	            	 	
 	            	ArrayAdapter<String> adapter = new ArrayAdapter<String>(getBaseContext(),R.layout.list_item, placesNames);
 	            	// Assign adapter to ListView
-	            	lv.setAdapter(adapter); 
+	            	placesListView.setAdapter(adapter); 
 
 	            	TranslateAnimation anim = new TranslateAnimation(0,0,-1000,0);
-	            	anim.setDuration(lv.getAdapter().getCount()*100);
+	            	anim.setDuration(placesListView.getAdapter().getCount()*100);
 	            	anim.setFillAfter(true);
-	            	lv.setAnimation(anim);
+	            	placesListView.startAnimation(anim);
             	}
-            	else if(button.getText().equals("Hide Nearest Places"))
+            	else if(posStatus.equals("Hide"))
             	{   
-            		TranslateAnimation anim2 = new TranslateAnimation(0,-1000,0,0);
-            		anim2.setDuration(1000);
-	            	anim2.setFillAfter(true);
-	            	ll.startAnimation(anim2);
+            		if(placeLayoutDetails.getVisibility()==View.VISIBLE)
+	        		{
+	            		TranslateAnimation anim2 = new TranslateAnimation(0,-1000,0,0);
+	            		anim2.setDuration(1000);
+		            	anim2.setFillAfter(true);
+		            	placeLayoutDetails.startAnimation(anim2);
+	        		}
+	            	placeLayoutDetails.setVisibility(View.INVISIBLE);
             		
             		TranslateAnimation anim1 = new TranslateAnimation(0,1000,0,0);
             		anim1.setDuration(1000);
@@ -228,23 +229,48 @@ public class MainActivity extends MapActivity implements LocationListener
 	            	{
 	            	    public void onAnimationEnd(Animation animation) 
 	            	    {
-	            	    	button.setText("Show Nearest Places");
+	            	    	posStatus="Show";
 	    	            	ArrayList<String> placesNames = new ArrayList<String>();
 	    	            	ArrayAdapter<String> adapter = new ArrayAdapter<String>(getBaseContext(),R.layout.list_item, placesNames);
-	    	            	lv.setAdapter(adapter); 
+	    	            	placesListView.setAdapter(adapter); 
 	            	    }
 	            	    public void onAnimationStart(Animation animation){}
 						public void onAnimationRepeat(Animation animation){}
 	            	});
-	            	lv.startAnimation(anim1);
+	            	placesListView.startAnimation(anim1);
 	            }
             }
         });
         
+        logOutButton = (ImageButton) findViewById(R.id.imageButton2);
+        logOutButton.setOnClickListener(new View.OnClickListener() 
+        {
+			public void onClick(View v) 
+			{
+				 // Create new entry for the database and when the location is changed put those values in the db.
+		        LocationStuff locEntry = new LocationStuff(MainActivity.this);
+		        Bundle extras = getIntent().getExtras();
+		        String strvalue= extras.getString("username");        
+		        locEntry.open();
+		        locEntry.createEntry(strvalue, longitude, latitude);
+		        //System.out.println("Locs coming from user: " +strvalue);
+		        locEntry.clearDb();
+		        System.out.println("Local db on logOut: " +locEntry.getData());
+		        locEntry.close();    	
+
+				Intent broadcastIntent = new Intent();
+				broadcastIntent.setAction("com.package.ACTION_LOGOUT");
+				sendBroadcast(broadcastIntent);
+				
+				Intent logInIntent = new Intent(MainActivity.this, LoginActivity.class);
+				startActivity(logInIntent);
+			}
+		});
+   
         // Initialize map fields.
         mapController = mapView.getController();
         mapController.animateTo(point);
-        mapController.setZoom(13);
+        mapController.setZoom(17);
         mapView.invalidate();
     }
 
@@ -286,34 +312,36 @@ public class MainActivity extends MapActivity implements LocationListener
     public void onLocationChanged(Location location) 
     {   	
     	latitude = location.getLatitude();
-    	longitude = location.getLongitude();
-    	GeoPoint point = new GeoPoint((int)(latitude * 1E6), (int)(longitude *1E6));
+    	longitude = location.getLongitude();    	
+    	GeoPoint point = new GeoPoint((int)(latitude * 1E6), (int)(longitude *1E6));    	    	
     	
     	// Update itemizedoverlay when location changes.
     	List<Overlay> mapOverlays = mapView.getOverlays();
         CustomItemizedOverlay itemizedoverlay = (CustomItemizedOverlay) mapOverlays.get(0);
+    	
+        // Create new entry for the database and when the location is changed put those values in the local db.
+        LocationStuff locEntry = new LocationStuff(MainActivity.this);
+        Bundle extras = getIntent().getExtras();
+        String strvalue= extras.getString("username");        
+        locEntry.open();
+        locEntry.createLocalEntry(strvalue, longitude, latitude);
+        System.out.println("Local db on change: " + locEntry.getData());
+        locEntry.close();    	
+    	
         OverlayItem oldOverlayitem = itemizedoverlay.getItem(0);
         OverlayItem newOverlayitem = new OverlayItem(point," "," ");
         itemizedoverlay.setOverlay(oldOverlayitem,newOverlayitem);
         mapOverlays.set(0,itemizedoverlay);
-        WebServiceConnector ws = new WebServiceConnector();
-        /*try 
-        {
-			System.out.println(ws.getResponse());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
         
-        if(lv.getAdapter()!=null)
+        // set updated flag.
+        if(placesListView.getAdapter()!=null)
         {
-        	if(!lv.getAdapter().isEmpty())
+        	if(!placesListView.getAdapter().isEmpty())
             {
-        		button.setText("Update Nearest Places");
-        		button.setTextColor(-65536);
+        		posStatus="Update";
             }
         }
-        
+    	
     	mapController.animateTo(point);
     }
 
@@ -331,4 +359,37 @@ public class MainActivity extends MapActivity implements LocationListener
     {
     	Toast.makeText(this, "Disabled provider " + provider,Toast.LENGTH_SHORT).show();
     }
+    
+    public boolean isOnline() 
+    {
+        ConnectivityManager conMgr = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
+
+        if(netInfo == null || !netInfo.isConnected() || !netInfo.isAvailable())
+        {
+            Toast.makeText(getBaseContext(), "No Internet connection!", Toast.LENGTH_LONG).show();
+            return false;
+        }
+    return true; 
+    }
+    
+    public String getUsernameFromLogin() {
+    	Bundle extras = getIntent().getExtras();
+        String strvalue= extras.getString("username");
+        return strvalue;
+    }
+    
+    @Override
+    public void onBackPressed() 
+    {
+		new AlertDialog.Builder(MainActivity.this).setTitle(" ").setMessage("Please use the Log Out button at the top to logout first!").setIcon(R.drawable.warning).setNeutralButton("Close", null).show();  			        
+
+//		Dialog d = new Dialog(MainActivity.this);
+//		d.setTitle(":(");
+//		TextView tv = new TextView(MainActivity.this);
+//		tv.setText("Please use the Log Out button at the top to logout!");
+//		d.setContentView(tv);
+//		d.show();
+    }
+
 }

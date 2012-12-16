@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.ase_map"
-    android:versionCode="2"
-    android:versionName="0.1" >
+    android:versionCode="1"
+    android:versionName="0.8" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
  	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />  
+ 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -19,8 +20,8 @@
         <uses-library android:name="com.google.android.maps"/>
         
          <activity
-            android:name=".MainActivity"
-            android:label="@string/title_activity_main" 
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_registration_login" 
             android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,6 +29,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main" 
+            android:theme="@android:style/Theme.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name=".LogOutActivity"
+            android:label="@string/title_activity_logout" 
+            android:theme="@android:style/Theme.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+         
     </application>
 
 </manifest>

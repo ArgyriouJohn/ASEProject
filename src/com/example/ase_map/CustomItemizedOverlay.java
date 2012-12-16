@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,14 +14,16 @@ import android.graphics.Movie;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.view.View;
 import android.view.animation.TranslateAnimation;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;
 import com.google.android.maps.OverlayItem;
-import com.google.android.maps.Projection;
 
 public class CustomItemizedOverlay extends ItemizedOverlay
 {
@@ -28,21 +31,31 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 	private Context mContext;
 	private GeoPoint p;
 	private Integer counter;
+	private LinearLayout placeLayoutDetails;
+	private PlaceDetails placeDetails;
+	private PlacesList nearPlaces;
+	private GooglePlaces googlePlaces;
+	private GeoPoint focucedPlace;
 	
 	public CustomItemizedOverlay(Drawable defaultMarker) 
 	{
 		super(boundCenterBottom(defaultMarker));
 	}
 	
-	public CustomItemizedOverlay(Drawable defaultMarker, Context context) 
+	public CustomItemizedOverlay(Drawable defaultMarker, Context context,LinearLayout placeLayoutDetails,PlaceDetails placeDetails,PlacesList nearPlaces,GooglePlaces googlePlaces) 
 	{
 		super(boundCenterBottom(defaultMarker));
 		mContext = context;
+		this.placeLayoutDetails =placeLayoutDetails;
+		this.placeDetails=placeDetails;
+		this.googlePlaces =googlePlaces;
 	}
 	
 	public void addOverlay(OverlayItem overlay) 
 	{
 	    mOverlays.add(overlay);
+	    Drawable icon = mContext.getResources().getDrawable(R.drawable.android96);
+	    mOverlays.get(0).setMarker(boundCenterBottom(icon));
 	    populate();
 	}
 	
@@ -59,6 +72,8 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 			this.onTap(index);
 			this.onTap(index);
 		}
+	    Drawable icon = mContext.getResources().getDrawable(R.drawable.android96);
+	    mOverlays.get(0).setMarker(boundCenterBottom(icon));
 	    populate();
 	}
 	
@@ -79,21 +94,72 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 	{
 		  OverlayItem item = mOverlays.get(index);
 		  p = item.getPoint();
-		  // Show/Hide the bubble on Tap using a counter.
-		  if(counter == null)
-		  {
-			  counter=1;
-		  }
-		  else if(counter%2 != 0)
-		  {
-			  p = null; // if p=null , bubble gets removed. draw listens to that.
-			  counter++;
-		  }
-		  else 
-		  {
-			  counter++;
-		  }
 		  
+		  if(index!=0)
+		  {
+			  String placeName = item.getTitle();
+			  placeDetails = Utils.getPlaceDetails(placeName, nearPlaces, googlePlaces);
+			  Utils.createPlaceInfo(placeLayoutDetails,placeDetails,(Activity) mContext);
+			  
+			  Drawable icon = mContext.getResources().getDrawable(R.drawable.rmarker);
+			  mOverlays.get(index).setMarker(boundCenterBottom(icon));
+			  
+			  for(int i=1;i<mOverlays.size();i++)
+			  {
+				  if(i!=index)
+				  {
+					  Drawable icon1 = mContext.getResources().getDrawable(R.drawable.bmarker);
+					  mOverlays.get(i).setMarker(boundCenterBottom(icon1));
+				  }
+			  }
+			  
+			  placeLayoutDetails =  (LinearLayout) ((Activity)mContext).findViewById(R.id.LinearLayout2);
+			  if(placeLayoutDetails.getVisibility()==View.INVISIBLE)
+      		  {
+				  TranslateAnimation anim = new TranslateAnimation(-1000,0,0,0);
+	        	  anim.setDuration(1000);
+	        	  anim.setFillAfter(true);
+
+	        	  placeLayoutDetails.setVisibility(View.VISIBLE);
+	        	  placeLayoutDetails.startAnimation(anim);
+	        	  focucedPlace=item.getPoint();
+      		  }
+			  else
+			  {
+				  TranslateAnimation anim = new TranslateAnimation(0,-1000,0,0);
+	        	  anim.setDuration(1000);
+	        	  anim.setFillAfter(true);
+	        	  
+	        	  if(focucedPlace==p)
+	        	  {
+	        		  Drawable icon1 = mContext.getResources().getDrawable(R.drawable.bmarker);
+	    			  mOverlays.get(index).setMarker(boundCenterBottom(icon1));
+		        	  placeLayoutDetails.setVisibility(View.INVISIBLE);
+		        	  placeLayoutDetails.startAnimation(anim);
+	        	  }
+	        	  else
+	        	  {
+	        		  focucedPlace=item.getPoint();
+	        	  }
+			  }
+		  }
+		  else
+		  {
+			  // Show/Hide the debubble on Tap using a counter.
+			  if(counter == null)
+			  {
+				  counter=1;
+			  }
+			  else if(counter%2 != 0)
+			  {
+				  p = null; // if p=null , bubble gets removed. draw listens to that.
+				  counter++;
+			  }
+			  else 
+			  {
+				  counter++;
+			  }
+		  }
 		  return true;
 	}
 	
@@ -104,7 +170,7 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 		 // if p!=null create the bubble
 		 if(p!=null)
 		 {
-			 popupObject(canvas,mapView);
+			 //popupObject(canvas,mapView);
 		 }
 		 return true;
      }
@@ -127,7 +193,7 @@ public class CustomItemizedOverlay extends ItemizedOverlay
          paint.setARGB(150, 0, 0, 0); // alpha, r, g, b (Black, semi see-through)
 
          //---add the marker---
-         Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.sb);            
+         Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.sp);            
          canvas.drawBitmap(bmp, screenPts.x -85, screenPts.y -220, null);
          canvas.drawText(days.format(dNow), screenPts.x, screenPts.y -145, paint);
          canvas.drawText(hours.format(dNow), screenPts.x, screenPts.y -165, paint);
@@ -142,4 +208,25 @@ public class CustomItemizedOverlay extends ItemizedOverlay
      		    0, MapView.LayoutParams.LEFT | MapView.LayoutParams.BOTTOM);
         // mapView.addView(imageView, screenParameters);
 	  }
+	 
+	 public void setPlaceDetails(PlaceDetails placeDetails)
+	 {
+		 this.placeDetails = placeDetails;
+	 }
+	 
+	 public PlaceDetails getPlaceDetails()
+	 {
+		 return placeDetails;
+	 }
+	 
+	 public void setNearPlaces(PlacesList nearPlaces)
+	 {
+		 this.nearPlaces = nearPlaces;
+	 }
+	 
+	 public PlacesList getNearPlaces()
+	 {
+		 return nearPlaces;
+	 }
 }
+
