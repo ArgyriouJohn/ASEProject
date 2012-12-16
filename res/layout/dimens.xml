@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="custom_gap">20dip</dimen>
+    <dimen name="small_gap">8dip</dimen>
+    <dimen name="default_gap">16dip</dimen>
+</resources>

@@ -5,5 +5,5 @@
         android:layout_height="wrap_content"
         android:padding="10dip"
         android:textSize="14sp"
-        android:textColor="#1E1E1E"
+        android:textColor="#95FFFFFF"
     />

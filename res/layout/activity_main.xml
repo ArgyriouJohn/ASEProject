@@ -8,7 +8,7 @@
         android:id="@+id/mapview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:apiKey="0X2ubt8tG2XWrTp5E7TQTv4uaycIPzQE2OmpzyA"
+        android:apiKey="0gFM17_MU4h4NI8u1Xvueo4aOsXzVwBPeXq9xoQ"
         android:clickable="true"
         android:enabled="true" />
 
@@ -26,7 +26,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.60"
-            android:background="#90C8C8C8"
+            android:background="#97000000"
             android:orientation="vertical" >
 
             <!-- Name Label -->
@@ -35,46 +35,29 @@
                 android:id="@+id/imageView1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="TODO"
                 android:gravity="right"
                 android:src="@android:drawable/ic_menu_gallery" />
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
-                android:layout_marginTop="10dip"
-                android:text="@string/address_field"
-                android:textColor="#000000"
-                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/name"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#000000" />
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginBottom="5dip"
-                android:layout_marginTop="15dip"
-                android:text="@string/address_field"
-                android:textColor="#000000"
-                android:textStyle="bold" />
+                android:textColor="#95FFFFFF" />
 
             <TextView
                 android:id="@+id/address"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:textColor="#000000" />
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dip"
+                android:textColor="#95FFFFFF" />
 
             <TextView
                 android:id="@+id/phone"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dip"
-                android:textColor="#000000" />
+                android:layout_marginBottom="5dip"
+                android:textColor="#95FFFFFF" />
 
             <!-- Location Value -->
 
@@ -83,8 +66,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dip"
-                android:layout_marginTop="15dip"
-                android:textColor="#000000" />
+                android:layout_marginTop="5dip"
+                android:textColor="#95FFFFFF" />
 
             <TabHost
                 android:id="@+id/tabhost"
@@ -114,8 +97,8 @@
                             android:orientation="vertical" >
 
                             <Button
-                                android:id="@+id/button1"
-                                android:layout_width="wrap_content"
+                                android:id="@+id/checkInButton"
+								android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:gravity="left"
                                 android:text="Check In!" />
@@ -133,6 +116,12 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:orientation="vertical" >
+                            
+                            <Button
+                                android:id="@+id/reviewButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Button" />
 
                             <ListView
                                 android:id="@+id/ReviewListView"
@@ -150,7 +139,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.40"
-            android:background="#95C8C8C8" >
+            android:background="#96000000" >
         </ListView>
     </LinearLayout>
 
@@ -200,7 +189,18 @@
             android:layout_height="match_parent"
             android:layout_weight="0.13"
             android:background="#00000000"
-            android:src="@android:drawable/ic_menu_set_as" />
+            android:src="@android:drawable/ic_menu_set_as" />                
+            
     </LinearLayout>
+    
+    <ImageButton
+	    android:id="@+id/imageButton3"
+	    android:layout_width="50dp"
+	    android:layout_height="50dp"
+	    android:layout_above="@+id/LinearLayout1"
+	    android:layout_alignParentTop="true"
+	    android:background="#00000000"
+	    android:scaleType="center"
+	    android:src="@android:drawable/ic_menu_myplaces" />
 
 </RelativeLayout>

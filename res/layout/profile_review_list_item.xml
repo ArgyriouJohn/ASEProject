@@ -1,0 +1,80 @@
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/horizontalScrollView1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true"   
+    android:weightSum="1" 
+     >
+<LinearLayout 
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent"
+    android:background="#95000000"
+    android:orientation="horizontal"
+     >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.8"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/ReviewName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#95FFFFFF" />
+
+        <RatingBar
+            android:id="@+id/ReviewRating"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5" />
+
+        <TextView
+            android:id="@+id/ReviewText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#95FFFFFF" />
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/LikeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.05"
+        android:background="#00000000"
+        android:paddingTop="@dimen/default_gap"
+        android:src="@drawable/like" />
+
+    <TextView
+        android:id="@+id/LikeCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.05"
+        android:paddingTop="@dimen/default_gap"
+        android:text="@string/likeCount"
+        android:textColor="#00ff00" />
+
+    <ImageButton
+        android:id="@+id/DislikeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.05"
+        android:background="#00000000"
+        android:paddingTop="@dimen/default_gap"
+        android:src="@drawable/dislike" />
+
+    <TextView
+        android:id="@+id/DislikeCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.05"
+        android:paddingTop="@dimen/default_gap"
+        android:text="@string/dislikeCount"
+        android:textColor="#ff0000" />
+
+</LinearLayout>
+ </HorizontalScrollView>
