@@ -25,7 +25,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.Menu;
@@ -35,7 +34,6 @@ import android.view.animation.TranslateAnimation;
 import android.view.animation.Animation.AnimationListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -65,7 +63,8 @@ public class MainActivity extends MapActivity implements LocationListener
     ImageButton logOutButton;
     ImageButton showNearLocButton;
     ImageButton accountInfoButton;
-   
+
+    
     TextView date;
     ListView placesListView;
     LinearLayout placeLayoutDetails;
@@ -97,15 +96,9 @@ public class MainActivity extends MapActivity implements LocationListener
         spec2.setContent(R.id.tab2);
         spec2.setIndicator("Reviews", getResources().getDrawable(R.drawable.review));
         
-//        TabSpec spec3=tabHost.newTabSpec("Tab 3");
-//        spec3.setIndicator("Tab 3");
-//        spec3.setContent(R.id.tab3);
-
         tabHost.addTab(spec1);
         tabHost.addTab(spec2);
-//        tabHost.addTab(spec3);
-        //Tab View End
-        
+       
         //Retrieve and show date.
         dNow = new Date( );
         SimpleDateFormat days = new SimpleDateFormat ("dd.MM.yy");
@@ -163,9 +156,9 @@ public class MainActivity extends MapActivity implements LocationListener
         GeoPoint point = new GeoPoint((int)(latitude * 1E6), (int)(longitude *1E6));
         
         // Dispalay an itemizedoverlay on the map.
-        List<Overlay> mapOverlays = mapView.getOverlays();	
+        final List<Overlay> mapOverlays = mapView.getOverlays();	
         Drawable drawable = this.getResources().getDrawable(R.drawable.bmarker);
-        CustomItemizedOverlay itemizedoverlay = new CustomItemizedOverlay(drawable, this,placeLayoutDetails,placeDetails, nearPlaces, googlePlaces);
+        final CustomItemizedOverlay itemizedoverlay = new CustomItemizedOverlay(drawable, this,placeLayoutDetails,placeDetails, nearPlaces, googlePlaces,reviewThread,checkInThread);
         OverlayItem overlayitem = new OverlayItem(point," "," ");
         itemizedoverlay.addOverlay(overlayitem);
         mapOverlays.add(itemizedoverlay);
@@ -182,7 +175,13 @@ public class MainActivity extends MapActivity implements LocationListener
         	{
 	        		String placeName = ((TextView) view).getText().toString();
 	        		placeDetails = Utils.getPlaceDetails(placeName, nearPlaces, googlePlaces);
-        			
+	        		
+	        		// set selected marker red and all others blue. 
+	        		List<Overlay> mapOverlays = mapView.getOverlays();
+	                CustomItemizedOverlay updatedItemizedoverlay = (CustomItemizedOverlay) mapOverlays.get(0);
+	             	updatedItemizedoverlay.setClickedMarker(position+1);
+	                mapOverlays.set(0,updatedItemizedoverlay);
+	        			        		        			
 	        		if(placeLayoutDetails.getVisibility()==View.INVISIBLE)
 	        		{
 		        		TranslateAnimation anim = new TranslateAnimation(300,0,0,0);
@@ -192,16 +191,17 @@ public class MainActivity extends MapActivity implements LocationListener
 	        		}
 	        		placeLayoutDetails.setVisibility(View.VISIBLE);
 	        		String location = Utils.createPlaceInfo(placeLayoutDetails,placeDetails,MainActivity.this);
-	        		if(reviewThread!=null)
-	        		{
-	        			reviewThread.removeCallbacksAndMessages(null);
-	        			reviewThread = Utils.getReviews(location,MainActivity.this);
-	        		}
-	        		else
-	        		{
-	        			reviewThread = Utils.getReviews(location,MainActivity.this);
-	        		}
 	        		
+	        		CustomItemizedOverlay threaditemizedoverlay = (CustomItemizedOverlay) mapOverlays.get(0);
+	        		
+	  			  	// update review thread!
+	  			  	Utils.getReviews(placeName,MainActivity.this).removeCallbacksAndMessages(null);
+	        		Utils.getReviews(placeName,MainActivity.this);
+	  			  
+	        		// update chechIn thread!
+	        		Utils.getCheckIns(placeName,MainActivity.this).removeCallbacksAndMessages(null);
+	        		Utils.getCheckIns(placeName,MainActivity.this);
+	        			
 	        		if(checkInThread!=null)
 	        		{
 	        			checkInThread.removeCallbacksAndMessages(null);
@@ -209,21 +209,25 @@ public class MainActivity extends MapActivity implements LocationListener
 	        		}
 	        		else
 	        		{
+	        			threaditemizedoverlay.getOverlayCheckInThread(true);
 	        			checkInThread = Utils.getCheckIns(location,MainActivity.this);
 	        		}
              }
         });
         
-        accountInfoButton = (ImageButton) findViewById(R.id.imageButton3);        
-        accountInfoButton.setOnClickListener(new View.OnClickListener() {
-			
+        accountInfoButton = (ImageButton) findViewById(R.id.imageButton3);
+        accountInfoButton.setOnClickListener(new View.OnClickListener() 
+        {	
 			@Override
-			public void onClick(View v) {
+			public void onClick(View v) 
+			{
 		        Bundle extras = getIntent().getExtras();
 		        String strvalue= extras.getString("username");        
-				Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);				
+				Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);
+				
 				profileIntent.putExtra("message", strvalue);
 				startActivity(profileIntent);			
+				System.out.println(strvalue);
 			}
 		});
         
@@ -232,7 +236,10 @@ public class MainActivity extends MapActivity implements LocationListener
         showNearLocButton.setOnClickListener(new View.OnClickListener() 
         {
             public void onClick(View v) 
-            {              	
+            {   
+            	List<Overlay> mapOverlays = mapView.getOverlays();
+                CustomItemizedOverlay itemizedoverlay = (CustomItemizedOverlay) mapOverlays.get(0);
+            	
             	if(posStatus.equals("Show")||posStatus.equals("Update"))
             	{	
 	            	try 
@@ -246,10 +253,8 @@ public class MainActivity extends MapActivity implements LocationListener
 						e.printStackTrace();
 					}
 	                ArrayList<String> placesNames = new ArrayList<String>();
-	                
-	                List<Overlay> mapOverlays = mapView.getOverlays();
-	                CustomItemizedOverlay itemizedoverlay = (CustomItemizedOverlay) mapOverlays.get(0);
-	                
+	                itemizedoverlay.clear();
+	                	                
 	            	for(Place place : nearPlaces.results)
 	            	{
 	            		placesNames.add(place.name);
@@ -260,15 +265,16 @@ public class MainActivity extends MapActivity implements LocationListener
 	            	}
 	            	itemizedoverlay.setPlaceDetails(placeDetails);
 	            	itemizedoverlay.setNearPlaces(nearPlaces);
+	            	itemizedoverlay.lockMarkers(true);
 	            	mapOverlays.set(0,itemizedoverlay);
 	            	 	
 	            	ArrayAdapter<String> adapter = new ArrayAdapter<String>(getBaseContext(),R.layout.list_item, placesNames);
-	            	// Assign adapter to ListView
 	            	placesListView.setAdapter(adapter); 
 
 	            	TranslateAnimation anim = new TranslateAnimation(0,0,-1000,0);
 	            	anim.setDuration(placesListView.getAdapter().getCount()*100);
 	            	anim.setFillAfter(true);
+	            		            	
 	            	placesListView.startAnimation(anim);
             	}
             	else if(posStatus.equals("Hide"))
@@ -281,6 +287,11 @@ public class MainActivity extends MapActivity implements LocationListener
 		            	placeLayoutDetails.startAnimation(anim2);
 	        		}
 	            	placeLayoutDetails.setVisibility(View.INVISIBLE);
+	            	
+	            	// all Markers become blue.
+	            	itemizedoverlay.loseFocusMarker();
+	            	itemizedoverlay.lockMarkers(false);
+	            	mapOverlays.set(0,itemizedoverlay);
             		
             		TranslateAnimation anim1 = new TranslateAnimation(0,1000,0,0);
             		anim1.setDuration(1000);
@@ -382,7 +393,7 @@ public class MainActivity extends MapActivity implements LocationListener
         // Create new entry for the database and when the location is changed put those values in the local db.
         LocationStuff locEntry = new LocationStuff(MainActivity.this);
         Bundle extras = getIntent().getExtras();
-        String strvalue = extras.getString("username");        
+        String strvalue= extras.getString("username");        
         locEntry.open();
         locEntry.createLocalEntry(strvalue, longitude, latitude);
         System.out.println("Local db on change: " + locEntry.getData());

@@ -13,15 +13,22 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.text.Html;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class Utils 
 {
+	static Handler reviewThread = new Handler(); 
+	static Handler checkInThread = new Handler(); 
+	
 	public static PlaceDetails getPlaceDetails(String placeName,PlacesList nearPlaces,GooglePlaces googlePlaces)
 	{
 		PlaceDetails placeDetails = new PlaceDetails();
@@ -75,8 +82,8 @@ public class Utils
 	    java.util.Date utilDate = cal.getTime();
 	    final java.sql.Timestamp sqlDate = new  java.sql.Timestamp(utilDate.getTime());
 	    
-	    final Button checkinButton = (Button) activity.findViewById(R.id.checkInButton);		
-		final Button reviewButton = (Button) activity.findViewById(R.id.reviewButton);
+	    final Button checkinButton =(Button) activity.findViewById(R.id.checkInButton);		
+		final Button reviewButton =(Button) activity.findViewById(R.id.reviewButton);
 		reviewButton.setText("Write a review...");	
 		final String locationName = name;
 		
@@ -105,7 +112,6 @@ public class Utils
 				    {
 						System.out.println(ws.getCheckInResponse(uName,locationName,sqlDate));
 						checkinButton.setText("Success!");
-						checkinButton.setEnabled(false);
 					} catch (IOException e) 
 					{
 						// TODO Auto-generated catch block
@@ -135,33 +141,31 @@ public class Utils
 	
 	public static Handler getReviews(final String location,final Activity activity)
 	{
-		final Handler handler = new Handler();
 		Runnable runnable = new Runnable() 
 		{
 		   @Override
 		   public void run() 
 		   {
 				   new ReviewListTask(location,activity).execute();
-				   handler.postDelayed(this,5000);	
+				   reviewThread.postDelayed(this,3000);	
 		   }
 		};
-		handler.postDelayed(runnable, 0);	
-		return handler;
+		reviewThread.postDelayed(runnable, 0);
+		return reviewThread;
 	}
-	
+		
 	public static Handler getCheckIns(final String location,final Activity activity)
 	{
-		final Handler handler = new Handler();
 		Runnable runnable = new Runnable() 
 		{
 		   @Override
 		   public void run() 
 		   {
 				   new CheckInListTask(location,activity).execute();
-				   handler.postDelayed(this,5000);	
+				   checkInThread.postDelayed(this,3000);	
 		   }
 		};
-		handler.postDelayed(runnable, 0);	
-		return handler;
+		checkInThread.postDelayed(runnable, 0);	
+		return checkInThread;
 	}
 }

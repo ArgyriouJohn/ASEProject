@@ -15,6 +15,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
 import android.widget.LinearLayout;
@@ -37,18 +38,25 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 	private GooglePlaces googlePlaces;
 	private GeoPoint focucedPlace;
 	
+	private Handler reviewThread;
+	private Handler checkInThread;
+	private boolean threadFlag;
+	private boolean lock;
+	
 	public CustomItemizedOverlay(Drawable defaultMarker) 
 	{
 		super(boundCenterBottom(defaultMarker));
 	}
 	
-	public CustomItemizedOverlay(Drawable defaultMarker, Context context,LinearLayout placeLayoutDetails,PlaceDetails placeDetails,PlacesList nearPlaces,GooglePlaces googlePlaces) 
+	public CustomItemizedOverlay(Drawable defaultMarker, Context context,LinearLayout placeLayoutDetails,PlaceDetails placeDetails,PlacesList nearPlaces,GooglePlaces googlePlaces,Handler reviewThread, Handler checkInThread) 
 	{
 		super(boundCenterBottom(defaultMarker));
-		mContext = context;
+		this.mContext = context;
 		this.placeLayoutDetails =placeLayoutDetails;
 		this.placeDetails=placeDetails;
 		this.googlePlaces =googlePlaces;
+		this.threadFlag=false;
+		lock=false;
 	}
 	
 	public void addOverlay(OverlayItem overlay) 
@@ -92,8 +100,13 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 	@Override
 	protected boolean onTap(int index) 
 	{
+		System.out.println(lock);
+		if(lock==false)
+		{
 		  OverlayItem item = mOverlays.get(index);
 		  p = item.getPoint();
+		  
+		  threadFlag=false;
 		  
 		  if(index!=0)
 		  {
@@ -101,17 +114,16 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 			  placeDetails = Utils.getPlaceDetails(placeName, nearPlaces, googlePlaces);
 			  Utils.createPlaceInfo(placeLayoutDetails,placeDetails,(Activity) mContext);
 			  
-			  Drawable icon = mContext.getResources().getDrawable(R.drawable.rmarker);
-			  mOverlays.get(index).setMarker(boundCenterBottom(icon));
+			  // update review thread!
+			  Utils.getReviews(placeName,(Activity) mContext).removeCallbacksAndMessages(null);
+      		  Utils.getReviews(placeName,(Activity) mContext);
 			  
-			  for(int i=1;i<mOverlays.size();i++)
-			  {
-				  if(i!=index)
-				  {
-					  Drawable icon1 = mContext.getResources().getDrawable(R.drawable.bmarker);
-					  mOverlays.get(i).setMarker(boundCenterBottom(icon1));
-				  }
-			  }
+      		  // update chechIn thread!
+      		  Utils.getCheckIns(placeName,(Activity) mContext).removeCallbacksAndMessages(null);
+      		  Utils.getCheckIns(placeName,(Activity) mContext);
+    		  
+      		  // set clicked marker red and all others blue.
+      		  setClickedMarker(index);
 			  
 			  placeLayoutDetails =  (LinearLayout) ((Activity)mContext).findViewById(R.id.LinearLayout2);
 			  if(placeLayoutDetails.getVisibility()==View.INVISIBLE)
@@ -160,7 +172,8 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 				  counter++;
 			  }
 		  }
-		  return true;
+		}
+		return true;
 	}
 	
 	 @Override
@@ -228,4 +241,63 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 	 {
 		 return nearPlaces;
 	 }
+	 
+	 public Handler getOverlayReviewThread(boolean threadFlag)
+	 {
+		 this.threadFlag=true;
+		 if(threadFlag==true && reviewThread!=null)
+		 {
+			 reviewThread.removeCallbacksAndMessages(null);
+		 }
+		 return reviewThread;
+	 }
+	 
+	 public Handler getOverlayCheckInThread(boolean threadFlag)
+	 {
+		 this.threadFlag=true;
+		 if(threadFlag==true && checkInThread!=null)
+		 {
+			 checkInThread.removeCallbacksAndMessages(null);
+		 }
+		 return checkInThread;
+	 }
+	 
+	 public void setClickedMarker(int index)
+	 {
+		  Drawable icon = mContext.getResources().getDrawable(R.drawable.rmarker);
+		  mOverlays.get(index).setMarker(boundCenterBottom(icon));
+		  
+		  for(int i=1;i<mOverlays.size();i++)
+		  {
+			  if(i!=index)
+			  {
+				  Drawable icon1 = mContext.getResources().getDrawable(R.drawable.bmarker);
+				  mOverlays.get(i).setMarker(boundCenterBottom(icon1));
+			  }
+		  }	
+		  populate();
+	 }	
+	 	 
+	 public void clear()
+	 {
+		  OverlayItem item = mOverlays.get(0);
+		  mOverlays.clear();
+		  mOverlays.add(item);
+		  populate();
+	 }
+	 
+	 public void loseFocusMarker()
+	 {
+		 for(int i=1;i<mOverlays.size();i++)
+		  {
+			 Drawable icon1 = mContext.getResources().getDrawable(R.drawable.bmarker);
+			 mOverlays.get(i).setMarker(boundCenterBottom(icon1));
+		  }	
+	 }
+	 
+	 public void lockMarkers(boolean flag)
+	 {
+		 lock=flag;
+	 }
 }
+
