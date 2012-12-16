@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.aseproject.map"
+    package="com.example.ase_map"
     android:versionCode="1"
     android:versionName="1.0">
 
@@ -20,7 +20,7 @@
         <uses-library android:name="com.google.android.maps"/>
         
          <activity
-            android:name="com.aseproject.login.LoginActivity"
+            android:name=".LoginActivity"
             android:label="@string/app_name" 
             android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
@@ -42,7 +42,7 @@
             </intent-filter>
         </activity>
         
-        <activity android:name="com.aseproject.review.ReviewDialog"
+        <activity android:name=".DialogReview"
             android:theme="@android:style/Theme.Dialog"
             android:label="@string/title_activity_dialog_review">            
             <intent-filter>
@@ -52,7 +52,7 @@
         </activity>
         
         <activity
-            android:name="com.aseproject.login.LogOutActivity"
+            android:name=".LogOutActivity"
             android:label="@string/title_activity_logout" 
             android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
@@ -63,7 +63,7 @@
         </activity>
         
         <activity
-            android:name="com.aseproject.profile.ProfileActivity"
+            android:name="com.example.ase_map.ProfileActivity"
             android:theme="@android:style/Theme.NoTitleBar"
             android:label="@string/title_activity_profile" >
         </activity>

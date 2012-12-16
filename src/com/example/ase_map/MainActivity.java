@@ -25,6 +25,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.Menu;
@@ -54,8 +55,8 @@ public class MainActivity extends MapActivity implements LocationListener
 	private String provider;
 	private String posStatus;
 	
-	double latitude;
-    double longitude;
+	double latitude = 37.422006;
+    double longitude = -122.084095;
     
     GooglePlaces googlePlaces = new GooglePlaces();
     PlacesList nearPlaces;
@@ -63,7 +64,8 @@ public class MainActivity extends MapActivity implements LocationListener
     
     ImageButton logOutButton;
     ImageButton showNearLocButton;
-    
+    ImageButton accountInfoButton;
+   
     TextView date;
     ListView placesListView;
     LinearLayout placeLayoutDetails;
@@ -89,12 +91,12 @@ public class MainActivity extends MapActivity implements LocationListener
 
         TabSpec spec1=tabHost.newTabSpec("Tab 1");
         spec1.setContent(R.id.tab1);
-        spec1.setIndicator("Check Ins");
+        spec1.setIndicator("Check Ins", getResources().getDrawable(R.drawable.checkin));
 
         TabSpec spec2=tabHost.newTabSpec("Tab 2");
-        spec2.setIndicator("Reviews");
         spec2.setContent(R.id.tab2);
-
+        spec2.setIndicator("Reviews", getResources().getDrawable(R.drawable.review));
+        
 //        TabSpec spec3=tabHost.newTabSpec("Tab 3");
 //        spec3.setIndicator("Tab 3");
 //        spec3.setContent(R.id.tab3);
@@ -211,6 +213,19 @@ public class MainActivity extends MapActivity implements LocationListener
 	        		}
              }
         });
+        
+        accountInfoButton = (ImageButton) findViewById(R.id.imageButton3);        
+        accountInfoButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+		        Bundle extras = getIntent().getExtras();
+		        String strvalue= extras.getString("username");        
+				Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);				
+				profileIntent.putExtra("message", strvalue);
+				startActivity(profileIntent);			
+			}
+		});
         
         posStatus = "Show";
         showNearLocButton = (ImageButton) findViewById(R.id.imageButton1);
@@ -367,7 +382,7 @@ public class MainActivity extends MapActivity implements LocationListener
         // Create new entry for the database and when the location is changed put those values in the local db.
         LocationStuff locEntry = new LocationStuff(MainActivity.this);
         Bundle extras = getIntent().getExtras();
-        String strvalue= extras.getString("username");        
+        String strvalue = extras.getString("username");        
         locEntry.open();
         locEntry.createLocalEntry(strvalue, longitude, latitude);
         System.out.println("Local db on change: " + locEntry.getData());
@@ -428,13 +443,6 @@ public class MainActivity extends MapActivity implements LocationListener
     public void onBackPressed() 
     {
 		new AlertDialog.Builder(MainActivity.this).setTitle(" ").setMessage("Please use the Log Out button at the top to logout first!").setIcon(R.drawable.warning).setNeutralButton("Close", null).show();  			        
-
-//		Dialog d = new Dialog(MainActivity.this);
-//		d.setTitle(":(");
-//		TextView tv = new TextView(MainActivity.this);
-//		tv.setText("Please use the Log Out button at the top to logout!");
-//		d.setContentView(tv);
-//		d.show();
     }
 
 }

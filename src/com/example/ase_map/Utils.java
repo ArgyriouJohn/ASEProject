@@ -8,18 +8,16 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.text.Html;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 public class Utils 
@@ -45,10 +43,7 @@ public class Utils
 	}
 	
 	public static String createPlaceInfo(LinearLayout layout,PlaceDetails placeDetails,final Activity activity)
-	{
-		final Button checkinButton =(Button) activity.findViewById(R.id.button1);
-		checkinButton.setText("Check In!");
-		
+	{		
 		String name = placeDetails.result.name;
         String address = placeDetails.result.formatted_address;
 	    String phone = placeDetails.result.formatted_phone_number;
@@ -72,7 +67,6 @@ public class Utils
         lbl_phone.setText(Html.fromHtml("<b>Phone:</b> " + phone));
         lbl_location.setText(Html.fromHtml("<b>Latitude:</b> " + latitude + ", <b>Longitude:</b> " + longitude));
         
-        final String sqlLocation = name;
         Bundle extras = activity.getIntent().getExtras();
         String strvalue= extras.getString("username");
         final String uName = strvalue;
@@ -80,7 +74,26 @@ public class Utils
         java.util.Calendar cal = java.util.Calendar.getInstance();
 	    java.util.Date utilDate = cal.getTime();
 	    final java.sql.Timestamp sqlDate = new  java.sql.Timestamp(utilDate.getTime());
-	    			
+	    
+	    final Button checkinButton = (Button) activity.findViewById(R.id.checkInButton);		
+		final Button reviewButton = (Button) activity.findViewById(R.id.reviewButton);
+		reviewButton.setText("Write a review...");	
+		final String locationName = name;
+		
+		//Review Button Handler
+		reviewButton.setOnClickListener(new View.OnClickListener() 
+		{
+			public void onClick(View v) 
+			{
+				//Send to the SubmitReview Dialog the name of the place that was clicked
+				Intent reviewDialogIntent = new Intent(activity.getBaseContext(), DialogReview.class);
+				reviewDialogIntent.putExtra("locName", locationName);
+				reviewDialogIntent.putExtra("userName", uName);
+				activity.startActivity(reviewDialogIntent);
+			}
+		});
+					
+		//checkIn Button Handler
         checkinButton.setOnClickListener(new View.OnClickListener() 
         {
 			public void onClick(View v) 
@@ -90,8 +103,9 @@ public class Utils
 					WebServiceConnector ws = new WebServiceConnector();								   
 				    try 
 				    {
-						System.out.println(ws.getCheckInResponse(uName,sqlLocation,sqlDate));
+						System.out.println(ws.getCheckInResponse(uName,locationName,sqlDate));
 						checkinButton.setText("Success!");
+						checkinButton.setEnabled(false);
 					} catch (IOException e) 
 					{
 						// TODO Auto-generated catch block

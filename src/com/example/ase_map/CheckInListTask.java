@@ -1,18 +1,15 @@
 package com.example.ase_map;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-
 import android.app.Activity;
 import android.os.AsyncTask;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 class CheckInListTask extends AsyncTask<Void, Void,CheckInAdapter>
 {
 	private WebServiceConnector ws = new WebServiceConnector();		
-	private ArrayList<CheckIn> checkInList =new  ArrayList<CheckIn>();
+	private ArrayList<CheckIn> checkInList = new  ArrayList<CheckIn>();
     private Activity activity;
     CheckInAdapter adapter;
     ListView checkInListView;
@@ -33,7 +30,7 @@ class CheckInListTask extends AsyncTask<Void, Void,CheckInAdapter>
 	{
 		try 
 		{
-			checkInList = ws.getCheckInsResponse(location);
+			checkInList = ws.getCheckInsResponse(location, null);
 		} 
 		catch (IOException e) {e.printStackTrace();}
 		

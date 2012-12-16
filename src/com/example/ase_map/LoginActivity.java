@@ -22,6 +22,7 @@ public class LoginActivity extends Activity implements OnClickListener {
 
 	Button sqlRegister, sqlView, sqlLogin, sqlDelete, logOut;
 	EditText sqlUsername, sqlPassword, sqlEmail;	
+	
     @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -103,12 +104,14 @@ public class LoginActivity extends Activity implements OnClickListener {
 						String username = sqlUsername.getText().toString();
 						String password = sqlPassword.getText().toString();
 						String email = sqlEmail.getText().toString();
+						String firstName = "";
+						String lastName = "";
 						boolean isUsernameValid = checkInfo.checkUsername(username);
 						boolean isPasswordValid = checkInfo.checkPasswords(password);
 						boolean isEmailValid = checkInfo.checkEmail(email);
 						User entry = new User(LoginActivity.this);
 						entry.open();
-						if(isUsernameValid & isPasswordValid & isEmailValid & didItWork == entry.checkUserRegistration(username, password, email)) {
+						if(isUsernameValid & isPasswordValid & isEmailValid & didItWork == entry.checkUserRegistration(username, password, email, firstName, lastName)) {
 							//entry.createEntry(username, password, email);
 							entry.close();
 							didItWork = true;							

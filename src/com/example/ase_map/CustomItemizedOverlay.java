@@ -229,4 +229,3 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 		 return nearPlaces;
 	 }
 }
-

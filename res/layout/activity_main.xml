@@ -35,28 +35,45 @@
                 android:id="@+id/imageView1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="TODO"
                 android:gravity="right"
                 android:src="@android:drawable/ic_menu_gallery" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dip"
+                android:layout_marginTop="10dip"
+                android:text="@string/address_field"
+                android:textColor="#95FFFFFF"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/name"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
                 android:textColor="#95FFFFFF" />
 
             <TextView
-                android:id="@+id/address"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dip"
+                android:layout_marginTop="15dip"
+                android:text="@string/address_field"
+                android:textColor="#95FFFFFF"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/address"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
                 android:textColor="#95FFFFFF" />
 
             <TextView
                 android:id="@+id/phone"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dip"
+                android:layout_marginTop="10dip"
                 android:textColor="#95FFFFFF" />
 
             <!-- Location Value -->
@@ -66,7 +83,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dip"
-                android:layout_marginTop="5dip"
+                android:layout_marginTop="15dip"
                 android:textColor="#95FFFFFF" />
 
             <TabHost

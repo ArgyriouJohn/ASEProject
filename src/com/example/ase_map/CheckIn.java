@@ -1,7 +1,6 @@
 package com.example.ase_map;
 
 import java.io.Serializable;
-import java.sql.Date;
 import java.sql.Timestamp;
 
 public class CheckIn implements Serializable {

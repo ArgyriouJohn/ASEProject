@@ -32,7 +32,7 @@ class ReviewListTask extends AsyncTask<Void, Void,ReviewAdapter>
 	{
 		try 
 		{
-			reviewList = ws.getReviewsResponse(location);
+			reviewList = ws.getReviewsResponse(location, null);
 		} 
 		catch (IOException e) {e.printStackTrace();}
 		
