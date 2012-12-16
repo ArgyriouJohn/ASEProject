@@ -9,51 +9,40 @@ import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-class CheckInListTask extends AsyncTask<Void, Void, ArrayAdapter<String>>
+class CheckInListTask extends AsyncTask<Void, Void,CheckInAdapter>
 {
 	private WebServiceConnector ws = new WebServiceConnector();		
 	private ArrayList<CheckIn> checkInList =new  ArrayList<CheckIn>();
-	private ArrayList<String> checkins = new ArrayList<String>();
     private Activity activity;
-	ArrayAdapter<String> adapter;
-    
-    private String username;
-    private String location;
-    private Timestamp date;
+    CheckInAdapter adapter;
+    ListView checkInListView;
 
-     
-	public CheckInListTask(String uName,String sqlLocation,Timestamp sqlDate,Activity activity)
+    private String location;
+  
+	public CheckInListTask(String sqlLocation,Activity activity)
 	{
-		this.username=uName;
 		this.location=sqlLocation;
-		this.date=sqlDate;
 		this.activity=activity;
+		this.checkInListView = (ListView) activity.findViewById(R.id.CheckInListView);
 	}
 	
 	protected void onPreExecute() {}
 	
 	@Override
-	protected ArrayAdapter<String> doInBackground(Void... params) 
+	protected CheckInAdapter doInBackground(Void... params) 
 	{
 		try 
 		{
-			checkInList = ws.getCheckInsResponse(username,location,date);
+			checkInList = ws.getCheckInsResponse(location);
 		} 
 		catch (IOException e) {e.printStackTrace();}
 		
-		for(CheckIn c : checkInList)
-		{
-			checkins.add(c.getUsername()+" checked in at "+c.getLocation()+" at "+c.getTimeDate());
-		}
-     
-		adapter = new ArrayAdapter<String>(activity.getBaseContext(),android.R.layout.simple_list_item_1,checkins);
-    	    	
+		adapter = new CheckInAdapter(activity,R.layout.checkin_list_item,checkInList);
 		return adapter;
 	}
 	
-	protected void onPostExecute(ArrayAdapter<String> adapter)
+	protected void onPostExecute(CheckInAdapter adapter)
     {
-		ListView checkInListView = (ListView) activity.findViewById(R.id.listView2);
 		checkInListView.setAdapter(adapter);
 	}
 }

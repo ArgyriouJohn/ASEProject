@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.text.Html;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -43,7 +44,7 @@ public class Utils
 		return placeDetails;
 	}
 	
-	public static void createPlaceInfo(LinearLayout layout,PlaceDetails placeDetails,final Activity activity)
+	public static String createPlaceInfo(LinearLayout layout,PlaceDetails placeDetails,final Activity activity)
 	{
 		final Button checkinButton =(Button) activity.findViewById(R.id.button1);
 		checkinButton.setText("Check In!");
@@ -79,7 +80,7 @@ public class Utils
         java.util.Calendar cal = java.util.Calendar.getInstance();
 	    java.util.Date utilDate = cal.getTime();
 	    final java.sql.Timestamp sqlDate = new  java.sql.Timestamp(utilDate.getTime());
-	    
+	    			
         checkinButton.setOnClickListener(new View.OnClickListener() 
         {
 			public void onClick(View v) 
@@ -100,35 +101,7 @@ public class Utils
 				}
 			}
         });
-        
-       // public void toCallAsynchronous()
-        //{
-            TimerTask doAsynchronousTask;
-            final Handler handler = new Handler();
-            Timer timer = new Timer();
-            doAsynchronousTask = new TimerTask() 
-            {
-            	@Override
-                public void run() 
-                {
-                    handler.post(new Runnable() 
-                    {
-                        public void run() 
-                        {
-
-                            try 
-                            {
-                            	new CheckInListTask(uName,sqlLocation,sqlDate,activity).execute();
-                            } catch (Exception e) {}
-                        }
-                    });
-                }
-
-            };
-            timer.schedule(doAsynchronousTask, 0,5000);//execute in every 5000 ms
-        //}
-        
-        
+                              
         URL newurl;
 		try 
 		{
@@ -143,5 +116,38 @@ public class Utils
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return name;
+	}
+	
+	public static Handler getReviews(final String location,final Activity activity)
+	{
+		final Handler handler = new Handler();
+		Runnable runnable = new Runnable() 
+		{
+		   @Override
+		   public void run() 
+		   {
+				   new ReviewListTask(location,activity).execute();
+				   handler.postDelayed(this,5000);	
+		   }
+		};
+		handler.postDelayed(runnable, 0);	
+		return handler;
+	}
+	
+	public static Handler getCheckIns(final String location,final Activity activity)
+	{
+		final Handler handler = new Handler();
+		Runnable runnable = new Runnable() 
+		{
+		   @Override
+		   public void run() 
+		   {
+				   new CheckInListTask(location,activity).execute();
+				   handler.postDelayed(this,5000);	
+		   }
+		};
+		handler.postDelayed(runnable, 0);	
+		return handler;
 	}
 }

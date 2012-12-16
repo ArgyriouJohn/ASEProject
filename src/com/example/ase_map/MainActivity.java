@@ -17,6 +17,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.Settings;
 import android.provider.SyncStateContract.Constants;
@@ -37,6 +38,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
@@ -66,6 +69,8 @@ public class MainActivity extends MapActivity implements LocationListener
     LinearLayout placeLayoutDetails;
     
     Date dNow;
+    Handler reviewThread;
+    Handler checkInThread;
 	
     @SuppressLint("NewApi")
     @Override
@@ -77,6 +82,27 @@ public class MainActivity extends MapActivity implements LocationListener
         //Set loose policy.
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitNetwork().build();
         StrictMode.setThreadPolicy(policy);
+        
+        //Tab View Start
+        TabHost tabHost=(TabHost)findViewById(R.id.tabhost);
+        tabHost.setup();
+
+        TabSpec spec1=tabHost.newTabSpec("Tab 1");
+        spec1.setContent(R.id.tab1);
+        spec1.setIndicator("Check Ins");
+
+        TabSpec spec2=tabHost.newTabSpec("Tab 2");
+        spec2.setIndicator("Reviews");
+        spec2.setContent(R.id.tab2);
+
+//        TabSpec spec3=tabHost.newTabSpec("Tab 3");
+//        spec3.setIndicator("Tab 3");
+//        spec3.setContent(R.id.tab3);
+
+        tabHost.addTab(spec1);
+        tabHost.addTab(spec2);
+//        tabHost.addTab(spec3);
+        //Tab View End
         
         //Retrieve and show date.
         dNow = new Date( );
@@ -163,7 +189,26 @@ public class MainActivity extends MapActivity implements LocationListener
 		            	placeLayoutDetails.startAnimation(anim);
 	        		}
 	        		placeLayoutDetails.setVisibility(View.VISIBLE);
-	            	Utils.createPlaceInfo(placeLayoutDetails,placeDetails,MainActivity.this);
+	        		String location = Utils.createPlaceInfo(placeLayoutDetails,placeDetails,MainActivity.this);
+	        		if(reviewThread!=null)
+	        		{
+	        			reviewThread.removeCallbacksAndMessages(null);
+	        			reviewThread = Utils.getReviews(location,MainActivity.this);
+	        		}
+	        		else
+	        		{
+	        			reviewThread = Utils.getReviews(location,MainActivity.this);
+	        		}
+	        		
+	        		if(checkInThread!=null)
+	        		{
+	        			checkInThread.removeCallbacksAndMessages(null);
+	        			checkInThread = Utils.getCheckIns(location,MainActivity.this);
+	        		}
+	        		else
+	        		{
+	        			checkInThread = Utils.getCheckIns(location,MainActivity.this);
+	        		}
              }
         });
         
