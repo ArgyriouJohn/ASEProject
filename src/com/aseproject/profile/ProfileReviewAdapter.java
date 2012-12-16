@@ -9,9 +9,12 @@ import java.util.Date;
 
 import com.aseproject.map.R;
 import com.aseproject.review.Review;
+import com.aseproject.utilities.User;
 import com.aseproject.utilities.WebServiceConnector;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +49,7 @@ public class ProfileReviewAdapter extends ArrayAdapter<Review>
         TextView like = (TextView)v.findViewById(R.id.LikeCount);
         TextView dislike = (TextView)v.findViewById(R.id.DislikeCount);
        
-        Review review = data.get(position);
+        final Review review = data.get(position);
         
         final String username =review.getLocation();
         final String reviewText =review.getReviewText();
@@ -62,6 +65,32 @@ public class ProfileReviewAdapter extends ArrayAdapter<Review>
         rr.setRating(rating);
         like.setText(String.valueOf(likes));
         dislike.setText(String.valueOf(dislikes));
+        
+        rn.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(getContext());
+				myAlertDialog.setMessage("You are about to delete your check in.\n"+"This action cannot be undone!\n\n"+ "Do you want to proceed?");
+				myAlertDialog.setIcon(R.drawable.warning);
+				myAlertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+					public void onClick(DialogInterface arg0, int arg1) {
+						User entry = new User(activity.getBaseContext());
+						entry.open();
+						final Timestamp reviewDate = review.getTimeDate();
+						final String username = review.getUsername();
+						entry.deleteReview(username, reviewDate);
+						entry.close();					 
+				 }});
+				 
+				myAlertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {				      
+				public void onClick(DialogInterface arg0, int arg1) {
+					arg0.cancel();
+				  }});
+				myAlertDialog.show();				
+			}
+		});
         
         ImageButton LikeButton =(ImageButton) v.findViewById(R.id.LikeButton);
 		

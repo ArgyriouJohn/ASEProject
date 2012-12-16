@@ -119,13 +119,15 @@ public class Utils
 				    try 
 				    {
 						System.out.println(ws.getCheckInResponse(uName,locationName,sqlDate));
-						checkinButton.setText("Success!");
+						checkinButton.setText("You have successfully checked in!");
 					} catch (IOException e) 
 					{
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 						checkinButton.setText("Failure!");
 					}
+				} else {
+					checkinButton.setText("Check In!");
 				}
 			}
         });

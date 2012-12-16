@@ -25,6 +25,11 @@ public class CheckIn implements Serializable
 		this.profilePic = profilePic;
 	}
 	
+	public CheckIn(String user, Timestamp tD) {
+		this.username = user;
+		this.timeDate = tD;
+	}
+	
 	public String getUsername() 
 	{
 		return username;

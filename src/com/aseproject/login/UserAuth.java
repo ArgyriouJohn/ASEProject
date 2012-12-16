@@ -1,6 +1,7 @@
 package com.aseproject.login;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 public class UserAuth implements Serializable {
 
@@ -15,16 +16,16 @@ public class UserAuth implements Serializable {
 	private int day;	
 	private String profilePic;
 	private int isInvis;
+	private Timestamp checkInDate;
 	
 	public UserAuth() {				
 	}
 	
-	public UserAuth(String username, String password, String email, String first, String last) {
+	public UserAuth(String username, String password, String email) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
-		this.firstName = first; 
-		this.lastName = last;
+		
 	}
 	
 	public UserAuth(String username, String password) {
@@ -39,6 +40,11 @@ public class UserAuth implements Serializable {
 	public UserAuth(String username, int visInvis) {
 		this.username = username;
 		this.isInvis = visInvis;
+	}
+	
+	public UserAuth(String username, Timestamp date) {
+		this.username = username;
+		this.checkInDate = date;
 	}
 	
 	public UserAuth(String username, String first, String last, String gen, int d, int m, int y,String profilePic, int visibility) 

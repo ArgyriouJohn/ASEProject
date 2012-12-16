@@ -15,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.aseproject.login.UserAuth;
@@ -40,7 +41,7 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 	private GooglePlaces googlePlaces;
 	private GeoPoint focucedPlace;
 	private String username;
-	
+	private Button checkinButton;
 	private boolean lock;
 	private boolean showBubble;
 	
@@ -134,10 +135,12 @@ public class CustomItemizedOverlay extends ItemizedOverlay
 	@Override
 	protected boolean onTap(int index) 
 	{
+	    Button checkinButton = (Button) ((Activity) mContext).findViewById(R.id.checkInButton);	
 		if(lock==false)
 		{
 		  OverlayItem item = mOverlays.get(index);
 		  p = item.getPoint();
+		  checkinButton.setText("Check In!");
 		  
 		  if(index!=0)
 		  {

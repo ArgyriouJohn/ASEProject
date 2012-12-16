@@ -4,8 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -35,11 +35,9 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.aseproject.checkin.CheckIn;
 import com.aseproject.login.LoginActivity;
 import com.aseproject.login.UserAuth;
-import com.aseproject.map.MainActivity;
 import com.aseproject.map.R;
 import com.aseproject.review.Review;
 import com.aseproject.utilities.User;
@@ -122,8 +120,7 @@ public class ProfileActivity extends Activity
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
-		
+		}		
 		
 		int day = user.getYear();
         int month = user.getMonth();
@@ -141,12 +138,10 @@ public class ProfileActivity extends Activity
            					
 		firstName.setText(user.getFirstName());
 		lastName.setText(user.getLastName());
-		String labelDate = String.valueOf(user.getYear() + " , " + String.valueOf(user.getMonth()) + " , " + String.valueOf(user.getDay()));
-						
+		String labelDate = String.valueOf(user.getYear() + " , " + String.valueOf(user.getMonth()) + " , " + String.valueOf(user.getDay()));						
 		final String [] items= new String [] {"Take from camera", "Select from gallery"};				
 		ArrayAdapter<String> adapter= new ArrayAdapter<String> (this, android.R.layout.select_dialog_item,items);
-		AlertDialog.Builder builder= new AlertDialog.Builder(this);
-		
+		AlertDialog.Builder builder= new AlertDialog.Builder(this);		
 		builder.setTitle("Select Image");
 		builder.setAdapter( adapter, new DialogInterface.OnClickListener() 
 		{
@@ -269,7 +264,7 @@ public class ProfileActivity extends Activity
 						temp = Base64.encodeToString(b, Base64.DEFAULT);		
 			        	Utils.setImgTemp(temp);
 			        	System.out.println("PIC RE");
-			        	System.out.println(entry.updateUserInfo(strvalue, firstName.getText().toString(), lastName.getText().toString(), radioButtonValue, myYear, myMonth+1, myDay, temp, 1));			        	
+			        	System.out.println(entry.updateUserInfo(strvalue, firstName.getText().toString(), lastName.getText().toString(), radioButtonValue, myYear, myMonth, myDay, temp, 1));			        	
 					}
 					
 		        	entry.close();
@@ -317,10 +312,10 @@ public class ProfileActivity extends Activity
 		@Override
 		public void onClick(View v) {
 	    // TODO Auto-generated method stub
-//	    final Calendar c = Calendar.getInstance();
-//	    myYear = c.get(Calendar.YEAR);
-//	    myMonth = c.get(Calendar.MONTH);
-//	    myDay = c.get(Calendar.DAY_OF_MONTH);
+	    final Calendar c = Calendar.getInstance();
+	    myYear = c.get(Calendar.YEAR);
+	    myMonth = c.get(Calendar.MONTH);
+	    myDay = c.get(Calendar.DAY_OF_MONTH);
 	    showDialog(ID_DATEPICKER);
 		}
 	};
@@ -329,33 +324,21 @@ public class ProfileActivity extends Activity
 	protected Dialog onCreateDialog(int id) {	
 		switch(id){
 		case ID_DATEPICKER:
-//	    Toast.makeText(ProfileActivity.this,"- onCreateDialog -", Toast.LENGTH_LONG).show();
-		System.out.println(myYear);
-	    return new DatePickerDialog(this, myDateSetListener,myYear, myMonth, myDay);
+	    return new DatePickerDialog(this, myDateSetListener,myDay, myMonth, myYear);
 	    default:
 	    return null;
 	    }
-	 }
+	}
     
 	private DatePickerDialog.OnDateSetListener myDateSetListener = new DatePickerDialog.OnDateSetListener(){
 		 public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-//			 String date = "Year: " + String.valueOf(year) + "\n" + "Month: " + String.valueOf(monthOfYear+1) + "\n" + "Day: " + String.valueOf(dayOfMonth);
-//			 String sYear = String.valueOf(year);
-//			 String sMonth = String.valueOf(monthOfYear);
-//			 String sDay = String.valueOf(dayOfMonth);
-//			 String con = sYear + "-" + sMonth + "-" + sDay;
-//		        java.util.Calendar cal = java.util.Calendar.getInstance();
-//			    java.util.Date utilDate = cal.getTime();
-//			    final java.sql.Timestamp sqlDate = new  java.sql.Timestamp(utilDate.getTime());
-//			 System.out.println(sqlDate);
 			 myYear = year;
 			 myMonth = monthOfYear;
 			 myDay = dayOfMonth;
 			 String labelDate = String.valueOf(dayOfMonth)+ " , " + String.valueOf(monthOfYear+1) + " , " + String.valueOf(year);
-//			 Toast.makeText(ProfileActivity.this, date, Toast.LENGTH_LONG).show();
 			 dobLabel.setText("Date of Birth: " + labelDate);
 		 } 
-	 };
+	};
 	 
 	 @Override
 		protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -379,7 +362,7 @@ public class ProfileActivity extends Activity
 			        if (f.exists()) f.delete();		
 			        break;
 		    }
-		}
+	    }
 		
 		private void doCrop() {
 	        final ArrayList<CropOption> cropOptions = new ArrayList<CropOption>();	 

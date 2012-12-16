@@ -31,6 +31,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -78,6 +79,7 @@ public class MainActivity extends MapActivity implements LocationListener
     ImageButton accountInfoButton;
     ImageButton visInvis;
 
+    Button checkInButton;
     
     TextView date;
     ListView placesListView;
@@ -178,8 +180,7 @@ public class MainActivity extends MapActivity implements LocationListener
         mapOverlays.add(itemizedoverlay);
                        
      // Getting listview
-        placesListView = (ListView) findViewById(R.id.listView1);
-        
+        placesListView = (ListView) findViewById(R.id.listView1);       
         placeLayoutDetails = (LinearLayout) findViewById(R.id.LinearLayout2);
         placeLayoutDetails.setVisibility(View.INVISIBLE);
         
@@ -187,6 +188,7 @@ public class MainActivity extends MapActivity implements LocationListener
         {
         	public void onItemClick(AdapterView<?> parent, View view,int position, long id) 
         	{
+        	    Button checkinButton = (Button) findViewById(R.id.checkInButton);		
         		String placeName = ((TextView) view).getText().toString();
         		placeDetails = Utils.getPlaceDetails(placeName, nearPlaces, googlePlaces);
         		
@@ -195,7 +197,9 @@ public class MainActivity extends MapActivity implements LocationListener
                 CustomItemizedOverlay updatedItemizedoverlay = (CustomItemizedOverlay) mapOverlays.get(0);
              	updatedItemizedoverlay.setClickedMarker(position+1);
                 mapOverlays.set(0,updatedItemizedoverlay);
-        			        		        			
+        		
+                checkinButton.setText("Check In!");
+                
         		if(placeLayoutDetails.getVisibility()==View.INVISIBLE)
         		{
 	        		TranslateAnimation anim = new TranslateAnimation(300,0,0,0);

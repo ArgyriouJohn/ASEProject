@@ -35,6 +35,11 @@ public class Review implements Serializable
 		this.timeDate = timeDate;
 	}
 	
+	public Review(String user, Timestamp tD) {
+		this.username = user;
+		this.timeDate = tD;
+	}
+	
 	public Review(String user, String loc, String revText, int rate, int likes, int dislikes, String profilePic,Timestamp timeDate) 
 	{
 		this.username = user;

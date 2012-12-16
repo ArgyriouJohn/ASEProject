@@ -41,8 +41,9 @@ public final class R {
         public static final int rmarker=0x7f020016;
         public static final int savechanges=0x7f020017;
         public static final int sp=0x7f020018;
-        public static final int vis=0x7f020019;
-        public static final int warning=0x7f02001a;
+        public static final int success=0x7f020019;
+        public static final int vis=0x7f02001a;
+        public static final int warning=0x7f02001b;
     }
     public static final class id {
         public static final int CheckInIcon=0x7f080034;

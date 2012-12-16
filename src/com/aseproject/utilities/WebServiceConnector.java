@@ -37,6 +37,8 @@ public class WebServiceConnector
 	private static final String METHOD_NAME7 = "deleteProfile";
 	private static final String METHOD_NAME8 = "retrieveProfile";
 	private static final String METHOD_NAME9 = "addVisibility";
+	private static final String METHOD_NAME10 = "deleteCheckIn";
+	private static final String METHOD_NAME11 = "deleteReview";
 	private static final String SOAP_ACTION = NAMESPACE+"/"+METHOD_NAME;
 	private static final String SOAP_ACTION1 = NAMESPACE+"/"+METHOD_NAME1;
 	private static final String SOAP_ACTION2 = NAMESPACE+"/"+METHOD_NAME2;
@@ -47,6 +49,8 @@ public class WebServiceConnector
 	private static final String SOAP_ACTION7 = NAMESPACE+"/"+METHOD_NAME7;
 	private static final String SOAP_ACTION8 = NAMESPACE+"/"+METHOD_NAME8;
 	private static final String SOAP_ACTION9 = NAMESPACE+"/"+METHOD_NAME9;
+	private static final String SOAP_ACTION10 = NAMESPACE+"/"+METHOD_NAME10;
+	private static final String SOAP_ACTION11 = NAMESPACE+"/"+METHOD_NAME11;
 		
 	private String initializeStuff(Object o, String methodName, String soapAction) throws IOException 
 	{
@@ -84,9 +88,9 @@ public class WebServiceConnector
 	    return output;
 	}
 	
-	public String getLoginResponse(String username, String password, String email, String firstName, String lastName) throws IOException
+	public String getLoginResponse(String username, String password, String email) throws IOException
 	{
-		UserAuth authData = new UserAuth(username, password, email, firstName, lastName);
+		UserAuth authData = new UserAuth(username, password, email);
 	    return initializeStuff(authData, METHOD_NAME, SOAP_ACTION);
 	}
 	
@@ -100,6 +104,18 @@ public class WebServiceConnector
 	{
 		UserAuth updateData = new UserAuth(username);
 		return initializeStuff(updateData, METHOD_NAME7, SOAP_ACTION7);
+	}
+	
+	public String getDeleteCheckInResponse(String username, Timestamp date) throws IOException
+	{
+		CheckIn checkInData = new CheckIn(username, date);
+		return initializeStuff(checkInData, METHOD_NAME10, SOAP_ACTION10);
+	}
+	
+	public String getDeleteReviewResponse(String username, Timestamp date) throws IOException
+	{
+		Review reviewData = new Review(username, date);
+		return initializeStuff(reviewData, METHOD_NAME11, SOAP_ACTION11);
 	}
 	
 	public String getVisibilityChangeResponse(String username, int visibility) throws IOException

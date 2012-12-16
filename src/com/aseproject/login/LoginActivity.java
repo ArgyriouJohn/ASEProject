@@ -105,16 +105,14 @@ public class LoginActivity extends Activity implements OnClickListener {
 					try {
 						String username = sqlUsername.getText().toString();
 						String password = sqlPassword.getText().toString();
-						String email = sqlEmail.getText().toString();
-						String firstName = "";
-						String lastName = "";
+						String email = sqlEmail.getText().toString();						
 						boolean isUsernameValid = checkInfo.checkUsername(username);
 						boolean isPasswordValid = checkInfo.checkPasswords(password);
 						boolean isEmailValid = checkInfo.checkEmail(email);
 						User entry = new User(LoginActivity.this);
 						entry.open();
-						if(isUsernameValid & isPasswordValid & isEmailValid & didItWork == entry.checkUserRegistration(username, password, email, firstName, lastName)) {
-							//entry.createEntry(username, password, email);
+						if(isUsernameValid && isPasswordValid && isEmailValid && didItWork) {
+							entry.checkUserRegistration(username, password, email);
 							entry.close();
 							didItWork = true;							
 						} else {
@@ -132,17 +130,11 @@ public class LoginActivity extends Activity implements OnClickListener {
 						TextView tv = new TextView(LoginActivity.this);
 						tv.setText(error);
 						d.setContentView(tv);
-						d.show();						
-						
+						d.show();												
 						didItWork = false;
 					} finally {
 						if(didItWork) {
-							Dialog d = new Dialog(LoginActivity.this);
-							d.setTitle(":)");
-							TextView tv = new TextView(LoginActivity.this);
-							tv.setText("Thank you for registeting!" + "\n" + "Now put that info again and click login!");
-							d.setContentView(tv);
-							d.show();
+							new AlertDialog.Builder(LoginActivity.this).setTitle(" ").setMessage("Thank you for registeting!" + "\n" + "Now just click login!").setIcon(R.drawable.success).setNeutralButton("Close", null).show();
 						}
 					}					
 				}

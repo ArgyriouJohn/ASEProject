@@ -1,6 +1,7 @@
 package com.aseproject.utilities;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 
 import com.aseproject.login.UserAuth;
 
@@ -66,7 +67,7 @@ public class User {
 		ourHelper.close();
 	}
 
-	public long createEntry(String name, String password, String email, String firstName, String lastName) {
+	public long createEntry(String name, String password, String email) {
 		// TODO Auto-generated method stub
 		WebServiceConnector myConnector = new WebServiceConnector();
 		ContentValues cv = new ContentValues();
@@ -74,7 +75,7 @@ public class User {
 		cv.put(KEY_PASSWORD, password);
 		cv.put(KEY_EMAIL, email);
 		try {
-			myConnector.getLoginResponse(name, password, email, firstName, lastName);
+			myConnector.getLoginResponse(name, password, email);
 			//System.out.println(myConnector.getResponse(name, password, email).toString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -101,29 +102,18 @@ public class User {
 		return result;
 	}
 	
-	public boolean checkUserRegistration(String username, String password, String email, String firstName, String lastName) {
-		
-        //Cursor myCursor = ourDatabase.rawQuery("SELECT * FROM " + DATABASE_TABLE + " WHERE " + KEY_USERNAME + "=? AND " + KEY_PASSWORD + "=? AND "
-        	//	+ KEY_EMAIL + "=?" , new String[]{username, password, email});
-        //if(myCursor != null) {
-        	//if(myCursor.getCount() > 0) {
+	public boolean checkUserRegistration(String username, String password, String email) {
 		WebServiceConnector myConnector = new WebServiceConnector();
     		try {
-				if(myConnector.getLoginResponse(username, password, email, firstName, lastName).equals("RegisterTrue")) {
-					System.out.println(myConnector.getLoginResponse(username, password, email, firstName, lastName));
+				if(myConnector.getLoginResponse(username, password, email).equals("RegisterTrue")) {
 					return true;
 				} else {
-					System.out.println(myConnector.getLoginResponse(username, password, email, firstName, lastName));
 					return false;
-				}
-					
+				}					
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return false;
-			}
-        	//}
-        //}        
+			}  
 	}
 	
 	public boolean updateUserInfo(String username, String firstName, String lastName, String gender, int day, int month, int year, String image, int visibility) {
@@ -155,6 +145,40 @@ public class User {
 			return false;
 		}
 
+	}
+	
+	public boolean deleteCheckIn(String username, Timestamp date) {
+		WebServiceConnector myConnector = new WebServiceConnector();
+		try {
+			if(myConnector.getDeleteCheckInResponse(username, date).equals("true")) {
+				System.out.println(myConnector.getDeleteCheckInResponse(username, date));
+				return true;
+			} else {
+				return false;
+			}
+				
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public boolean deleteReview(String username, Timestamp date) {
+		WebServiceConnector myConnector = new WebServiceConnector();
+		try {
+			if(myConnector.getDeleteReviewResponse(username, date).equals("true")) {
+				System.out.println(myConnector.getDeleteReviewResponse(username, date));
+				return true;
+			} else {
+				return false;
+			}
+				
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 	public boolean setVisibility(String username, int visibility) {
@@ -197,11 +221,11 @@ public class User {
 		//if(myCursor != null) {
 			//if(myCursor.getCount() > 0) {
 				try {
-					if(myConnector.getLoginResponse(username, password, null, null, null).equals("LoginTrue")) {
-						System.out.println(myConnector.getLoginResponse(username, password, null, null, null));
+					if(myConnector.getLoginResponse(username, password, null).equals("LoginTrue")) {
+						System.out.println(myConnector.getLoginResponse(username, password, ""));
 						return true;
 					} else {
-						System.out.println(myConnector.getLoginResponse(username, password, null, null, null));
+						System.out.println(myConnector.getLoginResponse(username, password, ""));
 						return false;
 					}
 						
@@ -213,9 +237,7 @@ public class User {
 				//return true;
 			//}
 		//}				
-	}
-	
-	
+	}	
 	
 	public String getUsername(String usernameFromTextField) {
 			String result = "";
