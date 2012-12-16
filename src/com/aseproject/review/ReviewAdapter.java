@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.aseproject.checkin.CheckIn;
+import com.aseproject.checkin.CheckInBitmap;
 import com.aseproject.login.UserAuth;
 import com.aseproject.map.R;
 import com.aseproject.profile.ProfileActivity;
@@ -26,12 +28,25 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+/**
+ * This class defines a Review adapter used to manipulate data in the Review listview.
+ * @author John Argyriou 2012
+ * @author Thanos Irodotou 2012
+ * @see Review 
+ * @see ReviewBitmap
+ */
 public class ReviewAdapter extends ArrayAdapter<ReviewBitmap>
 {
 	private Activity activity; 
-    ArrayList<ReviewBitmap> data;
-	String intent = "ReviewAdapter";
+    private ArrayList<ReviewBitmap> data;
+	private String intent = "ReviewAdapter";
    
+	/**
+    * This constructor creates an ReviewAdapter object.
+    * @param activity parent activity
+    * @param layoutResourceId resource id.
+    * @param data ReviewBitmap list.
+    */
     public ReviewAdapter(Activity activity, int layoutResourceId,ArrayList<ReviewBitmap> reviewList) 
     {
         super(activity, layoutResourceId, reviewList);
@@ -39,16 +54,23 @@ public class ReviewAdapter extends ArrayAdapter<ReviewBitmap>
         this.data = reviewList;
     }
 
+    /**
+	 * This method updates the current listview.
+	 * @param position item position.
+	 * @param convertView parent view.
+	 * @param parent parent group views.
+	 * @return View current view.
+	 */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) 
     {
-        View v = convertView;
-       
+    	// prepare view for update.
+        View v = convertView;       
     	LayoutInflater vi =(LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         v = vi.inflate(R.layout.review_list_item,null);
 
+     // create objects for list manipulation,
         final ReviewBitmap review = data.get(position);
-
         ImageView iv = (ImageView)v.findViewById(R.id.ReviewIcon);
         iv.setOnClickListener(new View.OnClickListener() 
         {
@@ -56,7 +78,7 @@ public class ReviewAdapter extends ArrayAdapter<ReviewBitmap>
 			@Override
 			public void onClick(View v) 
 			{
-
+				// on click go to another users account.
 				User entry = new User(activity);
 				entry.open();
 				final UserAuth user = entry.retrieveProfileInfo(review.getUsername());
@@ -81,15 +103,21 @@ public class ReviewAdapter extends ArrayAdapter<ReviewBitmap>
         final int rating =review.getRating();
         final int likes = review.getLikes();
         final int dislikes =review.getDislikes();
-            
+        
+        // assign username.
         rn.setText(username);
+        
+        // assign time and date.
         Timestamp date = review.getTimeDate();        
         SimpleDateFormat filter = new SimpleDateFormat ("dd-MM-yy");
+        
+        // assign review text ,rating, likes and dislikes.
         rt.setText(reviewText+" at "+filter.format(date));        
         rr.setRating(rating);
         like.setText(String.valueOf(likes));
         dislike.setText(String.valueOf(dislikes));
         
+        // assign profile pic.
         if(!profilePic.equals(""))
         {
 	        iv.setImageBitmap(review.getProfilePicBitmap());
@@ -98,9 +126,8 @@ public class ReviewAdapter extends ArrayAdapter<ReviewBitmap>
         {
         	iv.setImageResource(R.drawable.android96);
         }   
-        
-        ImageButton LikeButton =(ImageButton) v.findViewById(R.id.LikeButton);
-		
+
+        ImageButton LikeButton =(ImageButton) v.findViewById(R.id.LikeButton);		
 		LikeButton.setOnClickListener(new View.OnClickListener() 
 		{
 			public void onClick(View v) 
@@ -108,6 +135,7 @@ public class ReviewAdapter extends ArrayAdapter<ReviewBitmap>
 				WebServiceConnector ws = new WebServiceConnector();
 				try 
 				{
+					// update likes.
   					Calendar cal = Calendar.getInstance();
   				    Date utilDate = cal.getTime();
   					Timestamp sqlDate = new  Timestamp(utilDate.getTime());
@@ -126,6 +154,7 @@ public class ReviewAdapter extends ArrayAdapter<ReviewBitmap>
 				WebServiceConnector ws = new WebServiceConnector();
 				try 
 				{
+					// update dislikes.
 					Calendar cal = Calendar.getInstance();
   				    Date utilDate = cal.getTime();
   					Timestamp sqlDate = new  Timestamp(utilDate.getTime());

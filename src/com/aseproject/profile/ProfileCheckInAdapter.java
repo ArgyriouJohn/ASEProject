@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.aseproject.checkin.CheckIn;
-import com.aseproject.login.LoginActivity;
 import com.aseproject.map.R;
 import com.aseproject.utilities.User;
 
@@ -33,7 +31,7 @@ public class ProfileCheckInAdapter extends ArrayAdapter<CheckIn>
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) 
+    public View getView(final int position, View convertView, ViewGroup parent) 
     {
     	View v = convertView;
        final CheckIn checkIn = data.get(position);
@@ -41,23 +39,26 @@ public class ProfileCheckInAdapter extends ArrayAdapter<CheckIn>
         v = vi.inflate(R.layout.profile_checkin_list_item,null);        
 
         TextView rn = (TextView)v.findViewById(R.id.CheckInName);
-        TextView rt = (TextView)v.findViewById(R.id.CheckInText);
+        TextView rt = (TextView)v.findViewById(R.id.CheckInText);   
+        
         rn.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
-			public void onClick(View v) {
+			public void onClick(View view) 
+			{
 				AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(getContext());
 				myAlertDialog.setMessage("You are about to delete your check in.\n"+"This action cannot be undone!\n\n"+ "Do you want to proceed?");
 				myAlertDialog.setIcon(R.drawable.warning);
-				myAlertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-
-					public void onClick(DialogInterface arg0, int arg1) {
+				myAlertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() 
+				{
+					public void onClick(DialogInterface arg0, int arg1) 
+					{
 						User entry = new User(activity.getBaseContext());
 						entry.open();
 						final Timestamp checkInDate = checkIn.getTimeDate();
 						final String username = checkIn.getUsername();
 						entry.deleteCheckIn(username, checkInDate);
-						entry.close();					 
+						entry.close();
 				 }});
 				 
 				myAlertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {				      
@@ -66,8 +67,7 @@ public class ProfileCheckInAdapter extends ArrayAdapter<CheckIn>
 				  }});
 				myAlertDialog.show();				
 			}
-		});
-       
+		});				       
         
         rn.setText(checkIn.getLocation());
         

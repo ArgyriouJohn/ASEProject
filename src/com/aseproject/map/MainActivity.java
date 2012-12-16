@@ -4,12 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
@@ -39,7 +38,7 @@ import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.aseproject.facebook.FbShare;
 import com.aseproject.location.LocationsHandling;
 import com.aseproject.login.LoginActivity;
 import com.aseproject.login.UserAuth;
@@ -48,8 +47,13 @@ import com.aseproject.places.Place;
 import com.aseproject.places.PlaceDetails;
 import com.aseproject.places.PlacesList;
 import com.aseproject.profile.ProfileActivity;
+import com.aseproject.utilities.AseMapApplication;
 import com.aseproject.utilities.User;
 import com.aseproject.utilities.Utils;
+import com.facebook.GraphUser;
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
@@ -57,7 +61,13 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
-
+/**
+ * This class is the main class that extends the mapMactivity class.
+ * @author John Argyriou 2012
+ * @author Thanos Irodotou 2012
+ * @author Socratis Michaelides 2012
+ * @see CustomItemizedOverlay
+ */
 public class MainActivity extends MapActivity implements LocationListener 
 {
 	private MapView mapView;
@@ -67,8 +77,9 @@ public class MainActivity extends MapActivity implements LocationListener
 	private String provider;
 	private String posStatus;
 	
-	double latitude = 37.422006;
-    double longitude = -122.084095;
+	double latitude = 50.867714;
+    double longitude = -0.087478;
+    String TAG = "DEBUG";
     
     GooglePlaces googlePlaces = new GooglePlaces();
     PlacesList nearPlaces;
@@ -76,9 +87,11 @@ public class MainActivity extends MapActivity implements LocationListener
     
     ImageButton logOutButton;
     ImageButton showNearLocButton;
-    ImageButton accountInfoButton;
+    ImageButton accountInfoButton, fbButton;
     ImageButton visInvis;
-
+    
+    //fb pic
+    Bitmap bmap;
     Button checkInButton;
     
     TextView date;
@@ -87,6 +100,10 @@ public class MainActivity extends MapActivity implements LocationListener
     
     Date dNow;
 	
+    /**
+    * Initialize variables.
+    * @param Bundle savedInstanceState
+    */
     @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState) 
@@ -101,7 +118,8 @@ public class MainActivity extends MapActivity implements LocationListener
         //Tab View Start
         TabHost tabHost=(TabHost)findViewById(R.id.tabhost);
         tabHost.setup();
-
+        
+        // set tab icons.
         TabSpec spec1=tabHost.newTabSpec("Tab 1");
         spec1.setContent(R.id.tab1);
         spec1.setIndicator("Check Ins", getResources().getDrawable(R.drawable.checkin));
@@ -119,6 +137,28 @@ public class MainActivity extends MapActivity implements LocationListener
 	    date = (TextView) findViewById(R.id.textView1);
 	    date.setText(days.format(dNow));
 	    
+	    //set up facebook data
+		//check if logged in with fb
+	    if(getIntent().hasExtra("fbBitmap") || (((AseMapApplication) getApplication()).getFBloginStatus() == true))
+	    {   //get the active session
+	    	final Session session = Session.getActiveSession();
+	    	if (session != null && session.isOpened()) 
+	    	{
+	           Request request = Request.newMeRequest(session, new Request.GraphUserCallback() 
+	           {
+	               @Override
+	               public void onCompleted(GraphUser user, Response response) 
+	               {
+	                   if (session == Session.getActiveSession()) 
+	                   {
+	                       if (user != null) {}
+	                   }
+	           }});
+	           Request.executeBatchAsync(request);
+	    	}
+	     }
+	    
+	    // if there is na interet connection
         if (isOnline())
         {
             System.out.println("INTERNET's FINE"); 
@@ -127,6 +167,7 @@ public class MainActivity extends MapActivity implements LocationListener
         { 
             try 
             {
+            	// if not , show alert window.
             	new AlertDialog.Builder(getBaseContext()).setTitle("Info").setMessage("No internet connection."+"\n"
             		+ "Please check your internet settings!").setIcon(R.drawable.warning).setNeutralButton("Ok", null).show();
             }
@@ -160,11 +201,7 @@ public class MainActivity extends MapActivity implements LocationListener
         {
           System.out.println("Provider " + provider + " has been selected.");
           //onLocationChanged(location);
-        } else 
-        {
-          //latituteField.setText("Location not available");
-          //longitudeField.setText("Location not available");
-        }
+        } 
         
         // GPS Location
         GeoPoint point = new GeoPoint((int)(latitude * 1E6), (int)(longitude *1E6));
@@ -180,7 +217,7 @@ public class MainActivity extends MapActivity implements LocationListener
         mapOverlays.add(itemizedoverlay);
                        
      // Getting listview
-        placesListView = (ListView) findViewById(R.id.listView1);       
+        placesListView = (ListView) findViewById(R.id.listView1);
         placeLayoutDetails = (LinearLayout) findViewById(R.id.LinearLayout2);
         placeLayoutDetails.setVisibility(View.INVISIBLE);
         
@@ -197,11 +234,12 @@ public class MainActivity extends MapActivity implements LocationListener
                 CustomItemizedOverlay updatedItemizedoverlay = (CustomItemizedOverlay) mapOverlays.get(0);
              	updatedItemizedoverlay.setClickedMarker(position+1);
                 mapOverlays.set(0,updatedItemizedoverlay);
-        		
+
                 checkinButton.setText("Check In!");
                 
         		if(placeLayoutDetails.getVisibility()==View.INVISIBLE)
         		{
+        			// show animated list.
 	        		TranslateAnimation anim = new TranslateAnimation(300,0,0,0);
 	            	anim.setDuration(1000);
 	            	anim.setFillAfter(true);
@@ -210,13 +248,21 @@ public class MainActivity extends MapActivity implements LocationListener
         		placeLayoutDetails.setVisibility(View.VISIBLE);
         		Utils.createPlaceInfo(placeLayoutDetails,placeDetails,MainActivity.this);
         		
-  			  	// update review thread!
-  			  	Utils.getReviews(placeName,MainActivity.this).removeCallbacksAndMessages(null);
-        		Utils.getReviews(placeName,MainActivity.this);
+        		//Initialize lists.
+        		ListView checkInListView = (ListView) findViewById(R.id.CheckInListView);
+        		ListView reviewListView = (ListView) findViewById(R.id.ReviewListView);
+    			ArrayAdapter<String> loading = new ArrayAdapter<String>(MainActivity.this,R.layout.list_item);
+    			loading.add("Loading , please wait!");
+    			checkInListView.setAdapter(loading);
+    			reviewListView.setAdapter(loading);
+    			
+  			  	// update review thread!      		
+  			  	Utils.getReviews(false,placeName,MainActivity.this).removeCallbacksAndMessages(null);
+        		Utils.getReviews(true,placeName,MainActivity.this);
   			  
         		// update chechIn thread!
-        		Utils.getCheckIns(placeName,MainActivity.this).removeCallbacksAndMessages(null);
-        		Utils.getCheckIns(placeName,MainActivity.this);
+        		Utils.getCheckIns(false,placeName,MainActivity.this).removeCallbacksAndMessages(null);
+        		Utils.getCheckIns(true,placeName,MainActivity.this);
              }
         });
         
@@ -228,53 +274,89 @@ public class MainActivity extends MapActivity implements LocationListener
 	    final int userVisibility = user.getVisibility();
 	    entry.close();
 	    System.out.println(userVisibility);
-	    if(userVisibility == 0) {
+	    
+	    // change icon on visibility change
+	    if(userVisibility == 0) 
+	    {
 	    	visInvis.setBackgroundResource(R.drawable.vis);
-	    } else {
+	    } 
+	    else 
+	    {
 	    	visInvis.setBackgroundResource(R.drawable.invis);
 	    }
 	    
-        visInvis.setOnClickListener(new View.OnClickListener() {
-			
+        visInvis.setOnClickListener(new View.OnClickListener()
+        {	
 			@Override
-			public void onClick(View v) {
+			public void onClick(View v) 
+			{
+				// animate icon
 				AlphaAnimation alphaDown = new AlphaAnimation(1.0f, 0.3f);
 			    AlphaAnimation alphaUp = new AlphaAnimation(0.3f, 1.0f);
 			    alphaDown.setDuration(1000);
 			    alphaUp.setDuration(500);
 			    alphaDown.setFillAfter(true);
 			    alphaUp.setFillAfter(true);
-			    v.startAnimation(alphaUp);				    
+			    v.startAnimation(alphaUp);		 
+			    
 			    User entry = new User(MainActivity.this);
 			    entry.open();
 			    final UserAuth user = entry.retrieveProfileInfo(username);
-			    if(user.getVisibility() == 0) {
+			    if(user.getVisibility() == 0) // promt message on visibility change
+			    {
 			    	entry.setVisibility(username, 1);
 			    	visInvis.setBackgroundResource(R.drawable.invis);
 				    Toast.makeText(getApplicationContext(), "Your details are now invisible to others!", Toast.LENGTH_LONG).show();
-			    } else {
+			    } 
+			    else 
+			    {
 			    	entry.setVisibility(username, 0);
 			    	visInvis.setBackgroundResource(R.drawable.vis);
 				    Toast.makeText(getApplicationContext(), "Your details are now visible to others!", Toast.LENGTH_LONG).show();
 			    }
 			    entry.close();
 			}
-		});
+		}); 
         
+        
+        fbButton = (ImageButton) findViewById(R.id.fb_btn);
+        fbButton.setOnClickListener(new View.OnClickListener() 
+        {
+			@Override
+			public void onClick(View v) 
+			{
+				// go to facebook share window.
+				Intent i = new Intent(MainActivity.this, FbShare.class);
+		        startActivity(i);			
+			}
+        });
+        
+        // activate/deavtivate fb button.
+	    if(getIntent().hasExtra("fbLogin"))
+	    {
+	    	fbButton.setEnabled(true);
+	    }
+	    else
+	    {
+	    	fbButton.setEnabled(false);
+	    }
+
         accountInfoButton = (ImageButton) findViewById(R.id.showProfileImageButton);
         accountInfoButton.setOnClickListener(new View.OnClickListener() 
         {	
 			@Override
 			public void onClick(View v) 
 			{
+				//animate icon.
 				AlphaAnimation alphaDown = new AlphaAnimation(1.0f, 0.3f);
 			    AlphaAnimation alphaUp = new AlphaAnimation(0.3f, 1.0f);
 			    alphaDown.setDuration(1000);
 			    alphaUp.setDuration(500);
 			    alphaDown.setFillAfter(true);
 			    alphaUp.setFillAfter(true);
-			    v.startAnimation(alphaUp);	
+			    v.startAnimation(alphaUp);
 			    
+			    // go to profile window.
 		        Bundle extras = getIntent().getExtras();
 		        String strvalue= extras.getString("username");
 		        String intent = "MainActivity";
@@ -292,6 +374,7 @@ public class MainActivity extends MapActivity implements LocationListener
         {
             public void onClick(View v) 
             {   
+            	//animate icon.
 				AlphaAnimation alphaDown = new AlphaAnimation(1.0f, 0.3f);
 			    AlphaAnimation alphaUp = new AlphaAnimation(0.3f, 1.0f);
 			    alphaDown.setDuration(1000);
@@ -305,6 +388,7 @@ public class MainActivity extends MapActivity implements LocationListener
             	
             	if(posStatus.equals("Show")||posStatus.equals("Update"))
             	{	
+            		// show animated palces list.
 	            	try 
 	            	{
 						nearPlaces = googlePlaces.search(latitude, longitude,500,null);
@@ -320,6 +404,7 @@ public class MainActivity extends MapActivity implements LocationListener
 	                	                
 	            	for(Place place : nearPlaces.results)
 	            	{
+	            		// get places information.
 	            		placesNames.add(place.name);
 	            		GeoPoint geoPoint = new GeoPoint((int) (place.geometry.location.lat * 1E6),(int) (place.geometry.location.lng * 1E6));
 	            		
@@ -333,7 +418,8 @@ public class MainActivity extends MapActivity implements LocationListener
 	            	 	
 	            	ArrayAdapter<String> adapter = new ArrayAdapter<String>(getBaseContext(),R.layout.list_item, placesNames);
 	            	placesListView.setAdapter(adapter); 
-
+	            	
+	            	// animate the list.
 	            	TranslateAnimation anim = new TranslateAnimation(0,0,-1000,0);
 	            	anim.setDuration(placesListView.getAdapter().getCount()*100);
 	            	anim.setFillAfter(true);
@@ -342,8 +428,10 @@ public class MainActivity extends MapActivity implements LocationListener
             	}
             	else if(posStatus.equals("Hide"))
             	{   
+            		// hide animated list.
             		if(placeLayoutDetails.getVisibility()==View.VISIBLE)
 	        		{
+            			//animate the list.
 	            		TranslateAnimation anim2 = new TranslateAnimation(0,-1000,0,0);
 	            		anim2.setDuration(1000);
 		            	anim2.setFillAfter(true);
@@ -363,6 +451,7 @@ public class MainActivity extends MapActivity implements LocationListener
 	            	{
 	            	    public void onAnimationEnd(Animation animation) 
 	            	    {
+	            	    	// upadate list parameters.
 	            	    	posStatus="Show";
 	    	            	ArrayList<String> placesNames = new ArrayList<String>();
 	    	            	ArrayAdapter<String> adapter = new ArrayAdapter<String>(getBaseContext(),R.layout.list_item, placesNames);
@@ -381,31 +470,58 @@ public class MainActivity extends MapActivity implements LocationListener
         {
 			public void onClick(View v) 
 			{
+				//animate icon.
 				AlphaAnimation alphaDown = new AlphaAnimation(1.0f, 0.3f);
 			    AlphaAnimation alphaUp = new AlphaAnimation(0.3f, 1.0f);
 			    alphaDown.setDuration(1000);
 			    alphaUp.setDuration(500);
 			    alphaDown.setFillAfter(true);
 			    alphaUp.setFillAfter(true);
-			    v.startAnimation(alphaUp);	
+			    v.startAnimation(alphaUp);
 			    
-				 // Create new entry for the database and when the location is changed put those values in the db.
-		        LocationsHandling locEntry = new LocationsHandling(MainActivity.this);
-		        Bundle extras = getIntent().getExtras();
-		        String strvalue= extras.getString("username");        
-		        locEntry.open();
-		        locEntry.createEntry(strvalue, longitude, latitude);
-		        //System.out.println("Locs coming from user: " +strvalue);
-		        locEntry.clearDb();
-		        System.out.println("Local db on logOut: " +locEntry.getData());
-		        locEntry.close();    	
-
-				Intent broadcastIntent = new Intent();
-				broadcastIntent.setAction("com.package.ACTION_LOGOUT");
-				sendBroadcast(broadcastIntent);
-				
-				Intent logInIntent = new Intent(MainActivity.this, LoginActivity.class);
-				startActivity(logInIntent);
+				if(((AseMapApplication) getApplication()).getFBloginStatus() == false)	
+				{			    
+					 // Create new entry for the database and when the location is changed put those values in the db.
+			        LocationsHandling locEntry = new LocationsHandling(MainActivity.this);
+			        Bundle extras = getIntent().getExtras();
+			        String strvalue= extras.getString("username");        
+			        locEntry.open();
+			        locEntry.createEntry(strvalue, longitude, latitude);
+			        System.out.println("Locs coming from user: " +strvalue);
+			        locEntry.clearDb();
+			        System.out.println("Local db on logOut: " +locEntry.getData());
+			        locEntry.close();    	
+	
+					Intent broadcastIntent = new Intent();
+					broadcastIntent.setAction("com.package.ACTION_LOGOUT");
+					sendBroadcast(broadcastIntent);
+					
+					// go to logout window.
+					Intent logInIntent = new Intent(MainActivity.this, LoginActivity.class);
+					startActivity(logInIntent);
+				}
+				else
+				{
+					 // Create new entry for the database and when the location is changed put those values in the db.
+					LocationsHandling locEntry = new LocationsHandling(MainActivity.this);
+			        Bundle extras = getIntent().getExtras();
+			        String strvalue= extras.getString("username");        
+			        locEntry.open();
+			        locEntry.createEntry(strvalue, longitude, latitude);
+			        System.out.println("Locs coming from user: " +strvalue);
+			        locEntry.clearDb();
+			        System.out.println("Local db on logOut: " +locEntry.getData());
+			        locEntry.close();    	
+	
+					Intent broadcastIntent = new Intent();
+					broadcastIntent.setAction("com.package.ACTION_LOGOUT");
+					sendBroadcast(broadcastIntent);
+					
+					// facebook , go to logout window.
+					Intent i = new Intent(MainActivity.this, LoginActivity.class);
+					i.putExtra("fbLogout", "logout");
+					startActivity(i);	
+				}		
 			}
 		});
    
@@ -415,7 +531,13 @@ public class MainActivity extends MapActivity implements LocationListener
         mapController.setZoom(17);
         mapView.invalidate();
     }
-
+    
+    
+    /**
+    * This method creates a menu.
+    * @param Menu menu
+    * @return status
+    */    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) 
     {
@@ -423,26 +545,34 @@ public class MainActivity extends MapActivity implements LocationListener
         return true;
     }
     
+    /**
+	* This method dispalys a route.
+	* @return status
+	*/ 
     @Override
     protected boolean isRouteDisplayed() 
     {
         return false;
     }
     
-    /* Request updates at startup */
+    /**
+	* This method describes aht happens when the activity resumes.
+	*/ 
     @Override
     protected void onResume() 
     {
+       /* Request updates at startup */
       super.onResume();
       boolean enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
       if (!enabled) 
       {
+    	// if there is no internet , go to the settings screen
       	Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
       	startActivity(intent);
       } 
       locationManager.requestLocationUpdates(provider, 400, 1, this);
       
-
+      // update profile pic. 
       if(Utils.getImgTemp()!=null && !Utils.getImgTemp().equals(""))
       {
 		  List<Overlay> mapOverlays = mapView.getOverlays();
@@ -452,24 +582,32 @@ public class MainActivity extends MapActivity implements LocationListener
       }  
     }
 
-    /* Remove the locationlistener updates when Activity is paused */
+    /**
+   	* This method describes aht happens when the activity pauses.
+   	*/ 
     @Override
     protected void onPause() 
     {
+      /* Remove the locationlistener updates when Activity is paused */
       super.onPause();
       locationManager.removeUpdates(this);
       Utils.setImgTemp(null);
     }
 
+    /**
+   	* This method describes what  happens when the location changes.
+   	* @param Location location
+   	*/
     public void onLocationChanged(Location location) 
-    {   	
-    	if(Math.abs(latitude - location.getLatitude()) > 0.00005 || Math.abs(longitude - location.getLongitude()) > 0.00005)
+    {   
+    	// define a threshold of location cahnge
+    	if(Math.abs(latitude - location.getLatitude()) > 0.0005 || Math.abs(longitude - location.getLongitude()) > 0.0005)
     	{
+    		// get coordinates.
 	    	latitude = location.getLatitude();
 	    	longitude = location.getLongitude();    	
 	    	GeoPoint point = new GeoPoint((int)(latitude * 1E6), (int)(longitude *1E6));    
-	    	
-	    	
+	    	 	
 	    	// Update itemizedoverlay when location changes.
 	    	List<Overlay> mapOverlays = mapView.getOverlays();
 	        CustomItemizedOverlay itemizedoverlay = (CustomItemizedOverlay) mapOverlays.get(0);
@@ -501,21 +639,39 @@ public class MainActivity extends MapActivity implements LocationListener
     	}
     }
 
+    /**
+   	* This method describes what  happens when the status changes.
+   	* @param String provider
+   	* @param int status
+   	* @param Bundle extras
+   	*/
     public void onStatusChanged(String provider, int status, Bundle extras) 
     {
     	// TODO Auto-generated method stub
     }
 
+    /**
+   	* This method alerts if provider is disabled.
+   	* @param provider
+   	*/
     public void onProviderEnabled(String provider) 
     {
     	Toast.makeText(this, "Enabled new provider " + provider,Toast.LENGTH_SHORT).show();
     }
-
+    
+    /**
+   	* This method alerts if provider is enabled.
+   	* @param provider
+   	*/
     public void onProviderDisabled(String provider) 
     {
     	Toast.makeText(this, "Disabled provider " + provider,Toast.LENGTH_SHORT).show();
     }
     
+    /**
+   	* This method checks if internet or gprs is online.
+   	* @return status
+   	*/
     public boolean isOnline() 
     {
         ConnectivityManager conMgr = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -528,10 +684,14 @@ public class MainActivity extends MapActivity implements LocationListener
         }
     return true; 
     }
-       
+      
+    /**
+   	* This method describes what  happens when the back key is pressed.
+   	*/
     @Override
     public void onBackPressed() 
     {
+    	// user must logout first.
 		new AlertDialog.Builder(MainActivity.this).setTitle(" ").setMessage("Please use the Log Out button at the top to logout first!").setIcon(R.drawable.warning).setNeutralButton("Close", null).show();  			        
     }
 }

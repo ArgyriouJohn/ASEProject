@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,60 +16,83 @@ import android.widget.TextView;
 
 import com.aseproject.map.R;
 import com.aseproject.profile.ProfileActivity;
-import com.aseproject.utilities.Utils;
 
+/**
+ * This class defines an CheckIn adapter used to manipulate data in the CheckIn listview.
+ * @author John Argyriou 2012
+ * @author Thanos Irodotou 2012
+ * @see CheckIn 
+ * @see CheckInBitmap
+ */
 public class CheckInAdapter extends ArrayAdapter<CheckInBitmap>
-{
+{	
 	private Activity activity; 
-    ArrayList<CheckInBitmap> data;
+    ArrayList<CheckInBitmap> checkInList;
 	String intent = "CheckInAdapter";
    
+   /**
+    * This constructor creates an CheckInAdapter object.
+    * @param activity parent activity
+    * @param layoutResourceId resource id.
+    * @param checkInList CheckInBitmap list.
+    */
     public CheckInAdapter(Activity activity, int layoutResourceId,ArrayList<CheckInBitmap> checkInList) 
     {
         super(activity, layoutResourceId, checkInList);
         this.activity = activity;
-        this.data = checkInList;
+        this.checkInList = checkInList;
     }
 
+    /**
+     * This method updates the current listview.
+     * @param position item position.
+     * @param convertView parent view.
+     * @param parent parent group views.
+     * @return View current view.
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) 
     {
+    	// prepare view for update.
         View v = convertView;
-        final CheckInBitmap checkIn = data.get(position);
+        final CheckInBitmap checkIn = checkInList.get(position);
     	LayoutInflater vi =(LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         v = vi.inflate(R.layout.checkin_list_item,null);
-           
-        ImageView iv = (ImageView)v.findViewById(R.id.CheckInIcon);
-        iv.setOnClickListener(new View.OnClickListener() 
+        
+        // create objects for list manipulation
+        ImageView imageView = (ImageView)v.findViewById(R.id.CheckInIcon);
+        imageView.setOnClickListener(new View.OnClickListener() 
         {		
 			@Override
 			public void onClick(View v) 
 			{
+				// on click go to another users account.
 				Intent profileIntent = new Intent(activity, ProfileActivity.class);
 				profileIntent.putExtra("message", checkIn.getUsername());
 				profileIntent.putExtra("intent", intent);
 				activity.startActivity(profileIntent);
 			}
-		});
+		});        
+        TextView checkInName = (TextView)v.findViewById(R.id.CheckInName);
+        TextView checkInText = (TextView)v.findViewById(R.id.CheckInText);
         
-        TextView rn = (TextView)v.findViewById(R.id.CheckInName);
-        TextView rt = (TextView)v.findViewById(R.id.CheckInText);
-              
-        rn.setText(checkIn.getUsername());
+        // assign username.
+        checkInName.setText(checkIn.getUsername());
         
+        // assign time and date.
         Timestamp date = checkIn.getTimeDate();        
         SimpleDateFormat filter = new SimpleDateFormat ("dd-MM-yy , hh:mm");
-        rt.setText("Checked in at "+filter.format(date)+" !");
+        checkInText.setText("Checked in at "+filter.format(date)+" !");
         
-        String profilePic =checkIn.getProfilePic();
-        
+        // assign profile pic.
+        String profilePic =checkIn.getProfilePic();        
         if(!profilePic.equals(""))
         {
-	        iv.setImageBitmap(checkIn.getProfilePicBitmap());
+	        imageView.setImageBitmap(checkIn.getProfilePicBitmap());
         }
         else
         {
-        	iv.setImageResource(R.drawable.android96);
+        	imageView.setImageResource(R.drawable.android96);
         }   
 
         return v;

@@ -22,7 +22,11 @@ import com.aseproject.location.Locations;
 import com.aseproject.login.UserAuth;
 import com.aseproject.review.Review;
 
-
+/**
+* This class defines all client methods to relevant web service methods.
+* @author John Argyriou 2012
+* @author Thanos Irodotou 2012
+*/
 public class WebServiceConnector
 {
 	private static final String NAMESPACE = "http://server.aseserver.com";
@@ -51,8 +55,9 @@ public class WebServiceConnector
 	private static final String SOAP_ACTION9 = NAMESPACE+"/"+METHOD_NAME9;
 	private static final String SOAP_ACTION10 = NAMESPACE+"/"+METHOD_NAME10;
 	private static final String SOAP_ACTION11 = NAMESPACE+"/"+METHOD_NAME11;
-		
-	private String initializeStuff(Object o, String methodName, String soapAction) throws IOException 
+	
+	
+	private String initializeConnection(Object o, String methodName, String soapAction) throws IOException 
 	{
 		SoapObject request = new SoapObject(NAMESPACE, methodName); 	  
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -88,60 +93,134 @@ public class WebServiceConnector
 	    return output;
 	}
 	
+    /**
+    * This method is used to login users.
+    * @param username
+    * @param password
+    * @param email
+    * @return debbuging information.
+    */
 	public String getLoginResponse(String username, String password, String email) throws IOException
 	{
 		UserAuth authData = new UserAuth(username, password, email);
-	    return initializeStuff(authData, METHOD_NAME, SOAP_ACTION);
+	    return initializeConnection(authData, METHOD_NAME, SOAP_ACTION);
 	}
 	
+	 /**
+    * This method is used to update users personal information.
+    * @param username
+    * @param firstName
+    * @param lastName
+    * @param gender
+    * @param day
+    * @param month
+    * @param year
+    * @param image
+    * @param visibility
+    * @return debbuging information.
+    */
 	public String getUpdateResponse(String username, String firstName, String lastName, String gender, int day, int month, int year, String image, int visibility) throws IOException
 	{
 		UserAuth updateData = new UserAuth(username, firstName, lastName, gender, day, month, year, image, visibility);
-		return initializeStuff(updateData, METHOD_NAME1, SOAP_ACTION1);
+		return initializeConnection(updateData, METHOD_NAME1, SOAP_ACTION1);
 	}
 	
+	/**
+    * This method is used to delete a user's account.
+    * @param username
+    * @return debbuging information.
+	*/
 	public String getDeleteResponse(String username) throws IOException
 	{
 		UserAuth updateData = new UserAuth(username);
-		return initializeStuff(updateData, METHOD_NAME7, SOAP_ACTION7);
+		return initializeConnection(updateData, METHOD_NAME7, SOAP_ACTION7);
 	}
 	
+	/**
+    * This method is used to delete a user's check in.
+    * @param username
+    * @param date
+    * @return debbuging information.
+	*/
 	public String getDeleteCheckInResponse(String username, Timestamp date) throws IOException
 	{
 		CheckIn checkInData = new CheckIn(username, date);
-		return initializeStuff(checkInData, METHOD_NAME10, SOAP_ACTION10);
+		return initializeConnection(checkInData, METHOD_NAME10, SOAP_ACTION10);
 	}
 	
+	/**
+    * This method is used to delete a user's review.
+    * @param username
+    * @param date
+    * @return debbuging information.
+	*/
 	public String getDeleteReviewResponse(String username, Timestamp date) throws IOException
 	{
 		Review reviewData = new Review(username, date);
-		return initializeStuff(reviewData, METHOD_NAME11, SOAP_ACTION11);
+		return initializeConnection(reviewData, METHOD_NAME11, SOAP_ACTION11);
 	}
 	
+	/**
+    * This method is used to change a user's visibility.
+    * @param username
+    * @param visibility
+    * @return debbuging information.
+	*/
 	public String getVisibilityChangeResponse(String username, int visibility) throws IOException
 	{
 		UserAuth updateData = new UserAuth(username, visibility);
-		return initializeStuff(updateData, METHOD_NAME9, SOAP_ACTION9);
+		return initializeConnection(updateData, METHOD_NAME9, SOAP_ACTION9);
 	}
 	
+	/**
+    * This method is used to store a user's location.
+    * @param username
+    * @param longitude
+    * @param latitude
+    * @return debbuging information.
+	*/
 	public String getLocResponse(String username, Double longitude, Double latitude) throws IOException
 	{
 		Locations locData = new Locations(username, longitude, latitude); 
-	    return initializeStuff(locData, METHOD_NAME2, SOAP_ACTION2);
+	    return initializeConnection(locData, METHOD_NAME2, SOAP_ACTION2);
 	}
 	
+	/**
+    * This method is used to store a user's check in.
+    * @param username
+    * @param longitude
+    * @param timeDate
+    * @return debbuging information.
+	*/
 	public String getCheckInResponse(String username, String location, Timestamp timeDate) throws IOException
 	{
 		CheckIn checkInData = new CheckIn(username, location, timeDate);		
-		return initializeStuff(checkInData, METHOD_NAME3, SOAP_ACTION3);		
+		return initializeConnection(checkInData, METHOD_NAME3, SOAP_ACTION3);		
 	}
 	
+	/**
+    * This method is used to store a user's review.
+    * @param username
+    * @param location
+    * @param reviewText
+    * @param rating
+    * @param likes
+    * @param dislikes
+    * @param sqlDate
+    * @return debbuging information.
+	*/
 	public String getReviewResponse(String username, String location, String reviewText, int rating,int likes,int dislikes,Timestamp sqlDate) throws IOException
 	{		 
 		Review reviewData = new Review(username, location, reviewText, rating,likes,dislikes,sqlDate); 		
-	    return initializeStuff(reviewData, METHOD_NAME6, SOAP_ACTION6);
+	    return initializeConnection(reviewData, METHOD_NAME6, SOAP_ACTION6);
 	}
 	
+	/**
+    * This method is used to retrieve check ins.
+    * @param username
+    * @param location
+    * @return ArrayList CheckIn.
+	*/
 	public ArrayList<CheckIn> getCheckInsResponse(String location, String username) throws IOException
 	{
 		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME4); 
@@ -199,6 +278,12 @@ public class WebServiceConnector
 	    return checkIns;
 	}
 	
+	/**
+    * This method is used to retrieve Reviews.
+    * @param username
+    * @param location
+    * @return ArrayList Review.
+	*/
 	public ArrayList<Review> getReviewsResponse(String location, String username) throws IOException
 	{
 		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME5); 
@@ -256,6 +341,12 @@ public class WebServiceConnector
 	    return reviews;
 	}
 	
+	/**
+    * This method is used to retrieve profiles.
+    * @param username
+    * @param location
+    * @return UserAuth.
+	*/
 	public UserAuth getRetrieveProfileResponse(String username) throws IOException
 	{
 		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME8); 

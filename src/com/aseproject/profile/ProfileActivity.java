@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -35,9 +36,11 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.aseproject.checkin.CheckIn;
 import com.aseproject.login.LoginActivity;
 import com.aseproject.login.UserAuth;
+import com.aseproject.map.MainActivity;
 import com.aseproject.map.R;
 import com.aseproject.review.Review;
 import com.aseproject.utilities.User;
@@ -96,9 +99,9 @@ public class ProfileActivity extends Activity
         ProfileCheckInsView = (ListView) findViewById(R.id.ProfileCheckInsView);
         ProfileReviewsView = (ListView) findViewById(R.id.ProfileReviewsView);
         firstName = (EditText) findViewById(R.id.firstName);
-        firstName.setFocusable(false);
+//        firstName.setFocusable(false);
 		lastName = (EditText) findViewById(R.id.lastName);
-		lastName.setFocusable(false);
+//		lastName.setFocusable(false);
 		firstName.setEnabled(false);
 		lastName.setEnabled(false);	
     	pic = (ImageView) findViewById(R.id.profileImageButton);
@@ -109,18 +112,17 @@ public class ProfileActivity extends Activity
         entry.close();
         
         
-        //GET AND DISPLAY USER CHECKINS & REVIEWS
-		try {
-			checkInList = ws.getCheckInsResponse(null,strvalue);
-			reviewList = ws.getReviewsResponse(null, strvalue);
-			adapterCheckIn = new ProfileCheckInAdapter(this,R.layout.profile_checkin_list_item,checkInList);
-			adapterReview = new ProfileReviewAdapter(this,R.layout.profile_review_list_item, reviewList);
-			ProfileReviewsView.setAdapter(adapterReview);
-			ProfileCheckInsView.setAdapter(adapterCheckIn);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}		
+        //Initialize lists.
+        ListView profileCheckInListView = (ListView) findViewById(R.id.ProfileCheckInsView);
+        ListView profileReviewListView = (ListView) findViewById(R.id.ProfileReviewsView);
+        ArrayAdapter<String> loading = new ArrayAdapter<String>(this,R.layout.list_item);
+        loading.add("Loading , please wait!");
+        profileCheckInListView.setAdapter(loading);
+        profileReviewListView.setAdapter(loading);
+        
+        //Use threads to show and update profile reviews and checkins.
+		Utils.getProfileCheckIns(strvalue,this);
+		Utils.getProfileReviews(strvalue,this);
 		
 		int day = user.getYear();
         int month = user.getMonth();
@@ -210,7 +212,9 @@ public class ProfileActivity extends Activity
 				if (firstName.isEnabled() == false && lastName.isEnabled() == false) 
 				{
 					firstName.setEnabled(true);
+					firstName.setFocusable(true);
 					lastName.setEnabled(true);
+					lastName.setFocusable(true);
 					genderRadioGroup.setEnabled(true);
 					maleRadioButton.setEnabled(true);
 					femaleRadioButton.setEnabled(true);
@@ -224,7 +228,9 @@ public class ProfileActivity extends Activity
 				{					
 					editProfileButton.setImageResource(R.drawable.edit);
 					firstName.setEnabled(false);
+					firstName.setFocusable(true);
 					lastName.setEnabled(false);
+					lastName.setFocusable(true);
 					genderRadioGroup.setEnabled(false);
 					maleRadioButton.setEnabled(false);
 					femaleRadioButton.setEnabled(false);

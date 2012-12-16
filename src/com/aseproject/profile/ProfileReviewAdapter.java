@@ -9,12 +9,14 @@ import java.util.Date;
 
 import com.aseproject.map.R;
 import com.aseproject.review.Review;
+import com.aseproject.review.ReviewDialog;
 import com.aseproject.utilities.User;
 import com.aseproject.utilities.WebServiceConnector;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,8 +51,7 @@ public class ProfileReviewAdapter extends ArrayAdapter<Review>
         TextView like = (TextView)v.findViewById(R.id.LikeCount);
         TextView dislike = (TextView)v.findViewById(R.id.DislikeCount);
        
-        final Review review = data.get(position);
-        
+        final Review review = data.get(position);      
         final String username =review.getLocation();
         final String reviewText =review.getReviewText();
         final String location =review.getLocation();
@@ -71,9 +72,9 @@ public class ProfileReviewAdapter extends ArrayAdapter<Review>
 			@Override
 			public void onClick(View v) {
 				AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(getContext());
-				myAlertDialog.setMessage("You are about to delete your check in.\n"+"This action cannot be undone!\n\n"+ "Do you want to proceed?");
+				myAlertDialog.setMessage("Do you want to delete or edit your review.\n");
 				myAlertDialog.setIcon(R.drawable.warning);
-				myAlertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+				myAlertDialog.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
 
 					public void onClick(DialogInterface arg0, int arg1) {
 						User entry = new User(activity.getBaseContext());
@@ -84,9 +85,13 @@ public class ProfileReviewAdapter extends ArrayAdapter<Review>
 						entry.close();					 
 				 }});
 				 
-				myAlertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {				      
+				myAlertDialog.setNegativeButton("EDIT", new DialogInterface.OnClickListener() {				      
 				public void onClick(DialogInterface arg0, int arg1) {
 					arg0.cancel();
+					Intent reviewDialogIntent = new Intent(activity.getBaseContext(), ReviewDialog.class);
+					reviewDialogIntent.putExtra("locName", review.getLocation());
+					reviewDialogIntent.putExtra("userName", review.getUsername());
+					activity.startActivity(reviewDialogIntent);					
 				  }});
 				myAlertDialog.show();				
 			}

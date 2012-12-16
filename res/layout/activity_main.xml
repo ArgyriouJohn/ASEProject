@@ -11,6 +11,9 @@
         android:apiKey="0gFM17_MU4h4NI8u1Xvueo4aOsXzVwBPeXq9xoQ"
         android:clickable="true"
         android:enabled="true" />
+    
+         
+         
 
     <LinearLayout
         android:id="@+id/LinearLayout1"
@@ -18,6 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout1"
         android:gravity="right"
+       
         android:orientation="horizontal"
         android:weightSum="1" >
 
@@ -26,7 +30,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.60"
-            android:background="#97000000"
+            android:background="#96000000"
             android:orientation="vertical" >
 
             <!-- Name Label -->
@@ -36,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="right"
-                android:src="@android:drawable/ic_menu_gallery" />
+                android:src="@android:drawable/ic_menu_gallery" android:contentDescription="TODO"/>
 
             <TextView
                 android:id="@+id/name"
@@ -94,15 +98,13 @@
                             android:id="@+id/tab1"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:background="#95000000" >
+                            android:orientation="vertical" >
 
                             <Button
                                 android:id="@+id/checkInButton"
-                                android:layout_width="357dp"
-                                android:layout_height="40dp"
-                                android:gravity="center"
-                                android:text="Check In!" />
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center"/>
 
                             <ListView
                                 android:id="@+id/CheckInListView"
@@ -120,14 +122,13 @@
                             
                             <Button
                                 android:id="@+id/reviewButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Button" />
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"/>
 
                             <ListView
                                 android:id="@+id/ReviewListView"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content" >
+                                android:layout_height="match_parent" >
                             </ListView>
                         </LinearLayout>
                     </FrameLayout>
@@ -182,7 +183,7 @@
             android:layout_weight="0.2"
             android:background="#00000000"
             android:padding="5dp"
-            android:src="@android:drawable/ic_dialog_map" />
+            android:src="@android:drawable/ic_dialog_map" android:contentDescription="TODO"/>
 
         <ImageButton
             android:id="@+id/imageButton2"
@@ -205,10 +206,19 @@
             android:background="#00000000"
             android:scaleType="center"
             android:src="@android:drawable/ic_menu_myplaces" />
+        
+         <ImageButton
+             android:id="@+id/fb_btn"
+             android:layout_width="100dp"
+             android:layout_height="wrap_content"
+             android:background="#00000000"
+             android:scaleType="center"
+             android:padding="5dp"
+             android:src="@drawable/fb_icon" />
 
         <ImageButton
             android:id="@+id/visInvisImmageButton"
-            android:layout_width="50dp"
+            android:layout_width="70dp"
             android:layout_height="50dp"
             android:background="#00000000"
             android:scaleType="center" />

@@ -1,0 +1,36 @@
+
+       <LinearLayout
+             
+        android:id="@+id/LinearLayout1"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/facebook_bg"
+        android:gravity="center"
+        android:orientation="vertical"
+       >
+
+    <com.aseproject.facebook.FullListView
+        android:id="@+id/selection_list"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_margin="25dp"
+        android:layout_weight="0.00"
+        android:background="@drawable/button_border" />
+
+    <Button
+        android:id="@+id/confirmBtn"
+        android:layout_width="144dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Share" />
+
+    <Button
+        android:id="@+id/cancelBtn"
+        android:layout_width="145dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Cancel"/>
+
+</LinearLayout>

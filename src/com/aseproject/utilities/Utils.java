@@ -25,22 +25,39 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aseproject.checkin.CheckInListTask;
+import com.aseproject.map.CustomItemizedOverlay;
 import com.aseproject.map.R;
 import com.aseproject.places.GooglePlaces;
 import com.aseproject.places.Place;
 import com.aseproject.places.PlaceDetails;
 import com.aseproject.places.PlacesList;
+import com.aseproject.profile.CheckInListProfileTask;
+import com.aseproject.profile.ReviewListProfileTask;
 import com.aseproject.review.ReviewDialog;
 import com.aseproject.review.ReviewListTask;
 
+/**
+* This class is used for multiple purposes.
+* @author John Argyriou 2012
+* @author Thanos Irodotou 2012
+*/
 public class Utils 
 {
 	static Handler reviewThread = new Handler(); 
 	static Handler checkInThread = new Handler(); 
 	static String imgTemp;
+	static Bitmap imgTempBitmap;
 	
+    /**
+    * This method retrieves information for a location.
+    * @param placeName
+    * @param nearPlaces
+    * @param googlePlaces
+    * @return PlaceDetails
+    */
 	public static PlaceDetails getPlaceDetails(String placeName,PlacesList nearPlaces,GooglePlaces googlePlaces)
 	{
 		PlaceDetails placeDetails = new PlaceDetails();
@@ -57,6 +74,13 @@ public class Utils
 		return placeDetails;
 	}
 	
+    /**
+    * This method creates the  information window for a location.
+    * @param layout
+    * @param placeDetails
+    * @param activity
+    * @return location's name
+    */
 	public static String createPlaceInfo(LinearLayout layout,PlaceDetails placeDetails,final Activity activity)
 	{		
 		String name = placeDetails.result.name;
@@ -90,9 +114,9 @@ public class Utils
 	    java.util.Date utilDate = cal.getTime();
 	    final java.sql.Timestamp sqlDate = new  java.sql.Timestamp(utilDate.getTime());
 	    
-	    final Button checkinButton =(Button) activity.findViewById(R.id.checkInButton);		
-		final Button reviewButton =(Button) activity.findViewById(R.id.reviewButton);
-		reviewButton.setText("Write a review...");	
+	    final Button checkinButton = (Button) activity.findViewById(R.id.checkInButton);		
+		final Button reviewButton = (Button) activity.findViewById(R.id.reviewButton);
+		reviewButton.setText("Write or update a review...");	
 		final String locationName = name;
 		
 		//Review Button Handler
@@ -119,14 +143,16 @@ public class Utils
 				    try 
 				    {
 						System.out.println(ws.getCheckInResponse(uName,locationName,sqlDate));
-						checkinButton.setText("You have successfully checked in!");
+						Toast.makeText(activity.getBaseContext(), "Your have successfully checked in", Toast.LENGTH_LONG).show();
 					} catch (IOException e) 
 					{
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 						checkinButton.setText("Failure!");
 					}
-				} else {
+				} 
+				else 
+				{
 					checkinButton.setText("Check In!");
 				}
 			}
@@ -139,52 +165,130 @@ public class Utils
 			//newurl = new URL("http://maps.googleapis.com/maps/api/streetview?size=400x400&location="+name+"+&heading=235&sensor=false");
 			Bitmap bitmap = BitmapFactory.decodeStream(newurl.openConnection() .getInputStream()); 
 			lbl_img.setImageBitmap(bitmap);
-		} catch (MalformedURLException e) {
+		}
+		catch (MalformedURLException e) 
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return name;
 	}
 	
-	public static Handler getReviews(final String location,final Activity activity)
+    /**
+    * This method creates a thread that updates reviews.
+    * @param flag
+    * @param location
+    * @param activity
+    * @return Handler
+    */
+	public static Handler getReviews(boolean flag,final String location,final Activity activity)
+	{
+		if(flag==true)
+		{
+			Runnable runnable = new Runnable() 
+			{
+			   @Override
+			   public void run() 
+			   {
+				   new ReviewListTask(location,activity).execute();
+				   reviewThread.postDelayed(this,4000);	
+			   }
+			};
+			reviewThread.postDelayed(runnable, 0);
+		}
+		return reviewThread;
+	}
+	
+    /**
+    * This method creates a thread that updates checkins.
+    * @param flag
+    * @param location
+    * @param activity
+    * @return Handler
+    */
+	public static Handler getCheckIns(boolean flag,final String location,final Activity activity)
+	{
+		if(flag==true)
+		{
+			Runnable runnable = new Runnable() 
+			{
+			   @Override
+			   public void run() 
+			   {
+				   new CheckInListTask(location,activity).execute();
+				   checkInThread.postDelayed(this,4000);	
+			   }
+			};
+			checkInThread.postDelayed(runnable, 0);	
+		}
+		return checkInThread;
+	}
+	
+    /**
+    * This method creates a thread that updates profile reviews.
+    * @param flag
+    * @param activity
+    * @return Handler
+    */
+	public static Handler getProfileReviews(final String input,final Activity activity)
 	{
 		Runnable runnable = new Runnable() 
 		{
 		   @Override
 		   public void run() 
 		   {
-			   new ReviewListTask(location,activity).execute();
-			   reviewThread.postDelayed(this,4000);	
+			   new ReviewListProfileTask(input,activity).execute();
+			   reviewThread.postDelayed(this,3000);	
 		   }
 		};
 		reviewThread.postDelayed(runnable, 0);
 		return reviewThread;
 	}
-		
-	public static Handler getCheckIns(final String location,final Activity activity)
+	
+    /**
+    * This method creates a thread that updates check ins.
+    * @param flag
+    * @param activity
+    * @return Handler
+    */
+	public static Handler getProfileCheckIns(final String input,final Activity activity)
 	{
 		Runnable runnable = new Runnable() 
 		{
 		   @Override
 		   public void run() 
 		   {
-			   new CheckInListTask(location,activity).execute();
-			   checkInThread.postDelayed(this,4000);	
+			   new CheckInListProfileTask(input,activity).execute();
+			   checkInThread.postDelayed(this,3000);	
 		   }
 		};
 		checkInThread.postDelayed(runnable, 0);	
 		return checkInThread;
 	}
 	
+    /**
+    * This method decodes an image from sting to bitmap.
+    * @param input
+    * @return Bitmap
+    */
 	public static Bitmap decodeImage(String input)
 	{
         byte [] encodeByte=Base64.decode(input,Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
 	}
 	
+    /**
+    * This method resizes an image.
+    * @param input
+    * @param nWidth
+    * @param nHeight
+    * @return Bitmap
+    */
 	public static Bitmap resizeBitmap(Bitmap input,int nWidth, int nHeight)
 	{	
 		//resize img
@@ -205,6 +309,12 @@ public class Utils
 		return Bitmap.createBitmap(input, 0, 0,width, height, matrix, true);				
 	}
 	
+    /**
+    * This method rounds the corners of an image.
+    * @param bitmap
+    * @param pixels
+    * @return Bitmap
+    */
 	public static Bitmap getRoundedCornerBitmap(Bitmap bitmap,int pixels)
 	{
 		Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
@@ -227,14 +337,31 @@ public class Utils
         return output;
 	}
 	
+    /**
+    * This method sets the current profile pic.
+    * @param img
+    */
 	public static void setImgTemp(String img)
 	{
 		imgTemp=img;
 	}
 	
+    /**
+    * This method retrieves profile pic in string.
+    * @return profile pic
+    */
 	public static String getImgTemp()
 	{
 		return imgTemp;
+	}
+	
+    /**
+    * This method retrieves profile pic in bitmap.
+    * @return Bitmap
+    */
+	public static Bitmap getImgTempBmp()
+	{
+		return imgTempBitmap;
 	}
 
 }

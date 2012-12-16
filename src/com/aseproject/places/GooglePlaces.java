@@ -16,10 +16,12 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 
 import android.util.Log;
  
-
+/** TThis class is used to get places details from the Google Places API
+* @author John Argyriou 2012
+* */
 @SuppressWarnings("deprecation")
-public class GooglePlaces {
- 
+public class GooglePlaces 
+{
     /** Global instance of the HTTP transport. */
     private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
  
@@ -46,14 +48,14 @@ public class GooglePlaces {
      * @param types - type of place to search
      * @return list of places
      * */
-    public PlacesList search(double latitude, double longitude, double radius, String types) throws Exception {
- 
+    public PlacesList search(double latitude, double longitude, double radius, String types) throws Exception 
+    {
         this._latitude = latitude;
         this._longitude = longitude;
         this._radius = radius;
  
-        try {
- 
+        try 
+        {
             HttpRequestFactory httpRequestFactory = createRequestFactory(HTTP_TRANSPORT);
             HttpRequest request = httpRequestFactory.buildGetRequest(new GenericUrl(PLACES_SEARCH_URL));
             request.getUrl().put("key", API_KEY);
@@ -75,7 +77,9 @@ public class GooglePlaces {
             	return list;
             }
  
-        } catch (HttpResponseException e) {
+        } 
+        catch (HttpResponseException e) 
+        {
             Log.e("Error:", e.getMessage());
             return null;
         }
@@ -86,9 +90,10 @@ public class GooglePlaces {
      * @param refrence - reference id of place
      *                 - which you will get in search api request
      * */
-    public PlaceDetails getPlaceDetails(String reference) throws Exception {
-        try {
- 
+    public PlaceDetails getPlaceDetails(String reference) throws Exception 
+    {
+        try 
+        {
         	HttpRequestFactory httpRequestFactory = createRequestFactory(transport);
         	HttpRequest request = httpRequestFactory.buildGetRequest(new GenericUrl(PLACES_DETAILS_URL));
             request.getUrl().put("key", API_KEY);
@@ -99,7 +104,9 @@ public class GooglePlaces {
  
             return place;
  
-        } catch (HttpResponseException e) {
+        } 
+        catch (HttpResponseException e) 
+        {
             Log.e("Error in Perform Details", e.getMessage());
             throw e;
         }
@@ -108,18 +115,18 @@ public class GooglePlaces {
     /**
      * Creating http request Factory
      * */
-    public static HttpRequestFactory createRequestFactory(final HttpTransport transport) {
-    	 
+    public static HttpRequestFactory createRequestFactory(final HttpTransport transport) 
+    {	 
     	return transport.createRequestFactory(new HttpRequestInitializer() 
     	{
-    	public void initialize(HttpRequest request) {
-    	GoogleHeaders headers = new GoogleHeaders();
-    	headers.setApplicationName("Google-Places-DemoApp");
-    	request.setHeaders(headers);
-    	JsonHttpParser parser = new JsonHttpParser(new JacksonFactory());
-    	request.addParser(parser);
-            }
+	    	public void initialize(HttpRequest request) 
+	    	{
+		    	GoogleHeaders headers = new GoogleHeaders();
+		    	headers.setApplicationName("Google-Places-DemoApp");
+		    	request.setHeaders(headers);
+		    	JsonHttpParser parser = new JsonHttpParser(new JacksonFactory());
+		    	request.addParser(parser);
+	        }
         });
     }
- 
 }
